@@ -5,6 +5,9 @@
 ;; Copyright 2019 Lassi Kortela
 ;; SPDX-License-Identifier: ISC
 
+(require
+ racket/match)
+
 (define (complement f)
   (lambda args (not (apply f args))))
 
@@ -21,8 +24,11 @@
                     (else '()))
               (tree-heads predicate (cdr tree)))))
 
-(define (slurp/utf-8 filename)
-  (bytes->string/utf-8 (call-with-input-file filename port->bytes)))
+(define (map-tree-strings f tree)
+  (cond ((string? tree) (f tree))
+        ((not (pair? tree)) tree)
+        (else (cons (map-tree-strings f (car tree))
+                    (map-tree-strings f (cdr tree))))))
 
 (define (match-char? k char)
   (cond ((procedure? k) (not (not (k char))))
@@ -95,13 +101,46 @@
 (define (rnrs-tex-files rnrs)
   (sort (directory-list rnrs #:build? #t) path<?))
 
-(define (dump-rnrs-protos rnrs)
-  (for-each writeln
+(define (write-rnrs-protos rnrs)
+  (for-each (lambda (proto)
+              (match-let (((list tex-proto-command
+                                 (list name)
+                                 args
+                                 (list kind))
+                           proto))
+                (set! kind (cond ((equal? "procedure" kind) 'procedure)
+                                 ((equal? '(exprtype) kind) 'syntax)
+                                 (else (error "Unknown kind"))))
+                (writeln
+                 `(,kind
+                   ,name
+                   ,@(append-map
+                      (lambda (the-arg)
+                        (let ((the-arg
+                               (remove* '("")
+                                        (flatten (map-tree-strings string-trim
+                                                                   the-arg)))))
+                          (cond ((null? the-arg) '())
+                                ((string? (first the-arg))
+                                 `((arg ,(first the-arg))))
+                                (else
+                                 (let ((las (last the-arg)))
+                                   (if (equal? 'dotsfoo las)
+                                       `((arg "..." rest))
+                                       `((arg ,las))))))))
+                      (remove* '("") args))))))
             (tree-heads (lambda (head)
                           (or (equal? 'proto head)
                               (equal? 'rproto head)))
                         (flatten-1 (map parse-tex-file
                                         (rnrs-tex-files rnrs))))))
 
-(dump-rnrs-protos "r6rs")
-(dump-rnrs-protos "r7rs")
+(define (write-rnrs-protos-into-args-file rnrs)
+  (call-with-atomic-output-file
+   (string-append rnrs "-args.scm")
+   (lambda (out . _)
+     (parameterize ((current-output-port out))
+       (write-rnrs-protos rnrs)))))
+
+(write-rnrs-protos-into-args-file "r6rs")
+(write-rnrs-protos-into-args-file "r7rs")
