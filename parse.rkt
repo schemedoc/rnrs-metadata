@@ -128,7 +128,8 @@
                                           (list (first the-arg)))))
                                 (else
                                  (let ((las (last the-arg)))
-                                   (if (equal? 'dotsfoo las)
+                                   (if (or (equal? 'dots las)
+                                           (equal? 'dotsfoo las))
                                        `((arg "..." rest))
                                        `((arg ,las))))))))
                       (remove* '("") args))))))

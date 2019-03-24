@@ -93,7 +93,7 @@
 (procedure "enum-set-complement" (arg "enum-set"))
 (procedure "enum-set-projection" (arg "enum-set") (arg "enum-set"))
 (procedure "eval" (arg "expression") (arg "environment"))
-(procedure "environment" (arg "import-spec") (arg dots))
+(procedure "environment" (arg "import-spec") (arg "..." rest))
 (procedure "with-exception-handler" (arg "handler") (arg "thunk"))
 (procedure "file-exists?" (arg "filename"))
 (procedure "delete-file" (arg "filename"))
