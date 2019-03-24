@@ -80,5 +80,7 @@
    "r7rs"
    "https://bitbucket.org/cowan/r7rs/get/draft-10.tar.gz"))
 
+(r4rs)
+(r5rs)
 (r6rs)
 (r7rs)
