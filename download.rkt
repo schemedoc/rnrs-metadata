@@ -12,9 +12,14 @@
 (define cache-dir (build-path (current-directory) ".cache"))
 (define tmp-dir (build-path (current-directory) ".tmp"))
 
-(define (delete-empty-dirs path)
-  (for-each delete-empty-dirs (directory-list path #:build? #t))
-  (delete-directory path))
+(define (delete-tmp-files path)
+  (cond ((link-exists? path) #f)
+        ((and (file-exists? path)
+              (equal? #".tex" (path-get-extension path)))
+         (delete-file path))
+        ((directory-exists? path)
+         (for-each delete-tmp-files (directory-list path #:build? #t))
+         (delete-directory path))))
 
 (define (ensure-cached! url cache-basename)
   (make-directory* cache-dir)
@@ -33,8 +38,9 @@
 
 (define (perform rnrs url)
   (let ((cache-basename (string-append rnrs ".tar.gz")))
-    (make-directory* rnrs)
+    (delete-tmp-files tmp-dir)
     (make-directory* tmp-dir)
+    (make-directory* rnrs)
     (let ((files '()))
       (call-with-input-file (ensure-cached! url cache-basename)
         (lambda (tgz-input)
@@ -52,7 +58,7 @@
                    file-path
                    (build-path rnrs (file-name-from-path file-path))))
                 (sort files path<?)))
-    (delete-empty-dirs tmp-dir)))
+    (delete-tmp-files tmp-dir)))
 
 (define (r4rs)
   (perform
