@@ -2,9 +2,6 @@
 
 #lang racket
 
-;; Copyright 2019 Lassi Kortela
-;; SPDX-License-Identifier: ISC
-
 (require
  file/untgz
  net/url)
