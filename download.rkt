@@ -27,7 +27,7 @@
                "Downloading <~a> from <~a>...~%" cache-basename url)
       (call/input-url
        (string->url url)
-       get-pure-port
+       (lambda (url) (get-pure-port url '() #:redirections 1))
        (lambda (in)
          (call-with-atomic-output-file
           cache-filename
