@@ -218,8 +218,7 @@ variables exported by a library; see
 section~\ref{importsareimmutablesection}) is also
 considered a syntax violation.
 
-If a top-level or library form in a program is not syntactically
-correct, then the implementation must raise an exception with
+If a syntax violation occurs, the implementation must raise an exception with
 condition type {\cf\&syntax}, and execution of that top-level program
 or library must not be allowed to begin.
 
@@ -313,7 +312,11 @@ An object fetched from a location, by a variable reference or by
 a procedure such as {\cf car}, {\cf vector-ref}, or {\cf string-ref}, is
 equivalent in the sense of \ide{eqv?} % and \ide{eq?} ??
 (section~\ref{equivalencesection})
-to the object last stored in the location before the fetch.
+to the object last stored in the location before the fetch, except
+when that object is a procedure.  When the object is a procedure, the
+object fetched from the location will also be a procedure that behaves
+identically to the procedure last stored in the location, but it is
+possible that it is not the same object.
 
 Every location is marked to show whether it is in use.
 No variable or object ever refers to a location that is not in use.
@@ -334,7 +337,6 @@ are immutable objects, while all objects created by the other
 procedures listed in this report are mutable.  An attempt to store a
 new value into a location referred to by an immutable object
 should raise an exception with condition type {\cf\&assertion}.
-
 
 \section{Proper tail recursion}
 \label{proper tail recursion}

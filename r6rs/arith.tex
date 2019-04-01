@@ -113,11 +113,11 @@ With one argument, this procedure returns the additive
 inverse of its argument, provided that integer object is a
 fixnum.
 
-An exception with condition type {\cf\&assertion} is raised if the
+An exception with condition type {\cf\&implementation-restriction} is raised if the
 mathematically correct result of this procedure is not a fixnum.
 
 \begin{scheme}
-(fx- (least-fixnum))  \xev  \exception{\&assertion}%
+(fx- (least-fixnum))  \lev  \exception{\&implementation-restriction}%
 \end{scheme}
 \end{entry}
 
@@ -225,7 +225,7 @@ number of 1 bits in the two's complement representation of \var{fx}.
 Otherwise it returns the result of the following computation:
 %
 \begin{scheme}
-(fxnot (fxbit-count (fxnot \var{ei})))%
+(fxnot (fxbit-count (fxnot \var{fx})))%
 \end{scheme}
 \end{entry}
 
@@ -264,17 +264,18 @@ the two's complement representation of \var{fx}.  If
 \begin{entry}{%
 \proto{fxbit-set?}{ \vari{fx} \varii{fx}}{procedure}}
 
-\domain{\varii{Fx} must be non-negative and less than {\cf
-    (fixnum-width)}.}  The {\cf fxbit-set?} procedure returns
+\domain{\varii{Fx} must be non-negative.}  The {\cf fxbit-set?} procedure returns
 \schtrue{} if the \varii{fx}th bit is 1 in the two's complement
 representation of \vari{fx}, and \schfalse{} otherwise.  This is the
-fixnum result of the following computation:
+result of the following computation:
 %
 \begin{scheme}
-(not
-  (fxzero?
-    (fxand \vari{fx}
-           (fxarithmetic-shift-left 1 \varii{fx}))))%
+(if (fx>=? \varii{fx} (fx- (fixnum-width) 1))
+    (fxnegative? \vari{fx})
+    (not
+      (fxzero?
+         (fxand \vari{fx}
+                (fxarithmetic-shift-left 1 \varii{fx})))))%
 \end{scheme}
 %
 \end{entry}
@@ -283,7 +284,7 @@ fixnum result of the following computation:
 \proto{fxcopy-bit}{ \vari{fx} \varii{fx} \variii{fx}}{procedure}}
 
 \domain{\varii{Fx} must be non-negative and less than {\cf
-  (fixnum-width)}. \variii{Fx} must be 0 or
+  $w-1$}. \variii{Fx} must be 0 or
 1.}  The {\cf fxcopy-bit} procedure returns the result of replacing
 the \varii{fx}th bit of \vari{fx} by \variii{fx}, which is
 the result of the following computation:
@@ -300,7 +301,7 @@ the result of the following computation:
 \proto{fxbit-field}{ \vari{fx} \varii{fx} \variii{fx}}{procedure}}
 
 \domain{\varii{Fx} and \variii{fx} must be non-negative and less than
-  {\cf (fixnum-width)}.  Moreover, \varii{fx} must be less than or
+  $w$.  Moreover, \varii{fx} must be less than or
   equal to \variii{fx}.}  The {\cf fxbit-field} procedure returns the
 number represented by the bits at the positions from \varii{fx} (inclusive) to
 $\variii{fx}$ (exclusive), which is
@@ -319,10 +320,12 @@ the fixnum result of the following computation:
 \proto{fxcopy-bit-field}{ \vari{fx} \varii{fx} \variii{fx} \variv{fx}}{procedure}}
 
 \domain{\varii{Fx} and \variii{fx} must be non-negative and less than
-  {\cf (fixnum-width)}.  Moreover, \varii{fx} must be less than or
+  $w$.  Moreover, \varii{fx} must be less than or
   equal to \variii{fx}.}  The {\cf fxcopy-bit-field} procedure returns
 the result of replacing in \vari{fx} the bits at positions from
-\varii{fx} (inclusive) to $\variii{fx}$ (exclusive) by the corresponding bits in \variv{fx}, which
+\varii{fx} (inclusive) to $\variii{fx}$ (exclusive) by the bits in
+\variv{fx} from position 0 (inclusive) to position
+$\variii{fx}-\varii{fx}$ (exclusive), which
 is the fixnum result of the following computation:
 \begin{scheme}
 (let* ((to    \vari{fx})
@@ -332,10 +335,19 @@ is the fixnum result of the following computation:
        (mask1 (fxarithmetic-shift-left -1 start))
        (mask2 (fxnot
                (fxarithmetic-shift-left -1 end)))
-       (mask (fxand mask1 mask2)))
+       (mask (fxand mask1 mask2))
+       (mask3 (fxnot (fxarithmetic-shift-left
+                       -1 (- end start)))))
   (fxif mask
-        (fxarithmetic-shift-left from start)
+        (fxarithmetic-shift-left (fxand from mask3)
+                                 start)
         to))%
+\end{scheme}
+
+\begin{scheme}
+(fxcopy-bit-field \sharpsign{}b0000001 2 5 \sharpsign{}b1111000) \lev 1
+(fxcopy-bit-field \sharpsign{}b0000001 2 5 \sharpsign{}b0001111) \lev 29
+(fxcopy-bit-field \sharpsign{}b0001111 2 5 \sharpsign{}b0001111) \lev 31%
 \end{scheme}
 \end{entry}
 
@@ -343,7 +355,7 @@ is the fixnum result of the following computation:
 \proto{fxarithmetic-shift}{ \vari{fx} \varii{fx}}{procedure}}
 
 \domain{The absolute value of \varii{fx} must be less than 
-{\cf (fixnum-width)}.}  If
+$w$.}  If
 %
 \begin{scheme}
 (floor (* \vari{fx} (expt 2 \varii{fx})))%
@@ -358,8 +370,7 @@ raised.
 \proto{fxarithmetic-shift-left}{ \vari{fx} \varii{fx}}{procedure}
 \proto{fxarithmetic-shift-right}{ \vari{fx} \varii{fx}}{procedure}}
 
-\domain{\varii{Fx} must be non-negative, and less than {\cf
-    (fixnum-width)}.}
+\domain{\varii{Fx} must be non-negative, and less than $w$.}
   The {\cf fxarithmetic-shift-left} procedure behaves the same as {\cf
   fxarithmetic-shift}, and {\cf (fxarithmetic-shift-right \vari{fx}
   \varii{fx})} behaves the same as {\cf (fxarithmetic-shift \vari{fx}
@@ -370,8 +381,8 @@ raised.
 \proto{fxrotate-bit-field}{ \vari{fx} \varii{fx} \variii{fx} \variv{fx}}{procedure}}
 
 \domain{\varii{Fx}, \variii{fx}, and \variv{fx} must be non-negative
-  and less than {\cf (fixnum-width)}.  \varii{Fx} must be less than or
-  equal to \variii{fx}. \variv{Fx} must be less than the difference
+  and less than $w$.  \varii{Fx} must be less than or
+  equal to \variii{fx}. \variv{Fx} must be less than or equal to the difference
 between \variii{fx} and \varii{fx}.}  The {\cf fxrotate-bit-field}
 procedure returns the result of cyclically permuting in \vari{fx} the
 bits at positions from \varii{fx} (inclusive) to \variii{fx}
@@ -384,19 +395,14 @@ following computation:
        (end   \variii{fx})
        (count \variv{fx})
        (width (fx- end start)))
-  (if (fxpositive? width)
-      (let* ((count (fxmod count width))
-             (field0
-               (fxbit-field n start end))
-             (field1
-               (fxarithmetic-shift-left
-                 field0 count))
-             (field2
-               (fxarithmetic-shift-right
-                 field0 (fx- width count)))
-             (field (fxior field1 field2)))
-        (fxcopy-bit-field n start end field))
-      n))%
+  (fxcopy-bit-field n start end
+    (fxior
+      (fxarithmetic-shift-left
+        (fxbit-field n start (fx- end count))
+        count)
+      (fxarithmetic-shift-right
+        (fxbit-field n start end)
+        (fx- width count)))))%
 \end{scheme}
 
 \end{entry}
@@ -405,7 +411,7 @@ following computation:
 \proto{fxreverse-bit-field}{ \vari{fx} \varii{fx} \variii{fx}}{procedure}}
 
 \domain{\varii{Fx} and \variii{fx} must be non-negative and less than
-  {\cf (fixnum-width)}.  Moreover, \varii{fx} must be less than or
+  $w$.  Moreover, \varii{fx} must be less than or
   equal to \variii{fx}.}  The {\cf fxreverse-bit-field} procedure
 returns
 the fixnum obtained from \vari{fx} by reversing the
@@ -459,19 +465,19 @@ argument.
 \proto{fl>=?}{ \vari{fl} \varii{fl} \variii{fl} \dotsfoo}{procedure}}
 
 These procedures return \schtrue{} if their arguments are (respectively):
-equal, monotonically increasing, monotonically decreasing,
-monotonically nondecreasing, or monotonically nonincreasing,
+equal, monotonically increasing, monotonically nondecreasing,
+monotonically decreasing, or monotonically nonincreasing,
 \schfalse{} otherwise.  These
 predicates must be transitive.
 
 \begin{scheme}
-(fl= +inf.0 +inf.0)           \ev  \schtrue{}
-(fl= -inf.0 +inf.0)           \ev  \schfalse{}
-(fl= -inf.0 -inf.0)           \ev  \schtrue{}
-(fl= 0.0 -0.0)                \ev  \schtrue{}
-(fl< 0.0 -0.0)                \ev  \schfalse{}
-(fl= +nan.0 \var{fl})               \ev  \schfalse{}
-(fl< +nan.0 \var{fl})               \ev  \schfalse{}%
+(fl=? +inf.0 +inf.0)           \ev  \schtrue{}
+(fl=? -inf.0 +inf.0)           \ev  \schfalse{}
+(fl=? -inf.0 -inf.0)           \ev  \schtrue{}
+(fl=? 0.0 -0.0)                \ev  \schtrue{}
+(fl<? 0.0 -0.0)                \ev  \schfalse{}
+(fl=? +nan.0 \var{fl})               \ev  \schfalse{}
+(fl<? +nan.0 \var{fl})               \ev  \schfalse{}%
 \end{scheme}
 \end{entry}
 
@@ -509,7 +515,7 @@ than zero, {\cf flodd?} tests whether it is odd,
 \begin{note}
 {\cf (flnegative? -0.0)} must return \schfalse{},
 else it would lose the correspondence with
-{\cf (fl< -0.0 0.0)}, which is \schfalse{}
+{\cf (fl<? -0.0 0.0)}, which is \schfalse{}
 according to IEEE 754~\cite{IEEE}.
 \end{note}
 \end{entry}
@@ -584,8 +590,14 @@ Returns the absolute value of \var{fl}.
 
 These procedures implement number-theoretic integer division and
 return the results of the corresponding mathematical operations
-specified in report section~\extref{report:integerdivision}{Integer division}.  For zero divisors, these
-procedures may return a NaN or some unspecified flonum.
+specified in report section~\extref{report:integerdivision}{Integer division}.
+In the cases where the
+mathematical requirements in section~\extref{report:integerdivision} cannot be
+satisfied by any number object, either an exception is raised with
+condition type {\cf\&implementation-restriction}, or unspecified
+flonums (one for {\cf fldiv} {\cf flmod}, {\cf fldiv0} and {\cf
+  flmod0}, two for {\cf fldiv-and-mod} and {\cf fldiv0-and-mod0}) are
+returned.
 
 \begin{scheme}
 (fldiv \vari{fl} \varii{fl})         \ev \(\vari{fl}~\mathrm{div}~\varii{fl}\)
@@ -712,16 +724,19 @@ the result may be a NaN or some unspecified flonum.
   negative, \varii{fl} should be an integer object.}
 The {\cf flexpt} procedure returns \vari{fl} raised to the power \varii{fl}.  If \vari{fl} is
 negative and \varii{fl} is not an integer object, the result may be a
-NaN, or may be some unspecified flonum.  If \vari{fl} is zero, then
-the result is zero.
+NaN, or may be some unspecified flonum.
+If \vari{fl} and \varii{fl} are both zero, the result is
+1.0.  If \vari{fl} is zero and \varii{fl} is positive, the result is zero. 
+If \vari{fl} is zero and \varii{fl} is negative, the result may be a NaN, or may be
+some unspecified flonum.
 \end{entry}
 
 \begin{entry}{%
 \ctproto{no-infinities}
-\proto{make-no-infinities-violation}{ obj}{procedure}
+\proto{make-no-infinities-violation}{}{procedure}
 \proto{no-infinities-violation?}{ obj}{procedure}
 \ctproto{no-nans}
-\proto{make-no-nans-violation}{ obj}{procedure}
+\proto{make-no-nans-violation}{}{procedure}
 \proto{no-nans-violation?}{ obj}{procedure}}
 
 These condition types could be defined by the following code:
@@ -865,7 +880,7 @@ otherwise.  This is the result of the following computation:
 \domain{\varii{Ei} must be non-negative, and \variii{ei}
 must be either $0$ or $1$.}
 The {\cf bitwise-copy-bit} procedure returns the result of replacing
-the \varii{ei}th bit of \vari{ei} by the \varii{ei}th bit of \variii{ei}, which is
+the \varii{ei}th bit of \vari{ei} by \variii{ei}, which is
 the result of the following computation:
 \begin{scheme}
 (let* ((mask (bitwise-arithmetic-shift-left 1 \varii{ei})))
@@ -902,8 +917,10 @@ the result of the following computation:
 and \varii{ei} must be less than or equal to \variii{ei}.}
 The {\cf bitwise-copy-bit-field} procedure returns
 the result of replacing in \vari{ei} the bits at positions from
-\varii{ei} (inclusive) to $\variii{ei}$ (exclusive) by the corresponding bits in \variv{ei}, which
-is the fixnum result of the following computation:
+\varii{ei} (inclusive) to $\variii{ei}$ (exclusive) by the bits in
+\variv{ei} from position 0 (inclusive) to position
+$\variii{ei}-\varii{ei}$ (exclusive), which
+is the result of the following computation:
 %
 \begin{scheme}
 (let* ((to    \vari{ei})
@@ -964,9 +981,8 @@ returns the same result as
 \proto{bitwise-rotate-bit-field}{ \vari{ei} \varii{ei} \variii{ei} \variv{ei}}{procedure}}
 
 \domain{\varii{Ei}, \variii{ei}, \variv{ei} must be non-negative, 
-\varii{ei} must be less than or equal to \variii{ei}, and
-\variv{ei} must be non-negative.}
-procedure returns the result of cyclically permuting in \vari{ei} the
+\varii{ei} must be less than or equal to \variii{ei}.}
+The {\cf bitwise-rotate-bit-field} procedure returns the result of cyclically permuting in \vari{ei} the
 bits at positions from \varii{ei} (inclusive) to \variii{ei} (exclusive) by \variv{ei} bits
 towards the more significant bits, which is the result of the
 following computation:

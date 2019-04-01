@@ -89,7 +89,7 @@ concise:  \arbno{\meta{thing}} means zero or more occurrences of
 
 Some non-terminal names refer to the Unicode scalar values of the same
 name: \meta{character tabulation} (U+0009), \meta{linefeed} (U+000A),
-\meta{carriage return} (U+000D), \meta{line tabulation} (U+000B),
+\meta{line tabulation} (U+000B),
 \meta{form feed} (U+000C), \meta{carriage return} (U+000D),
 \meta{space} (U+0020), \meta{next line} (U+0085), \meta{line
   separator} (U+2028), and \meta{paragraph separator} (U+2029).
@@ -197,8 +197,8 @@ language: {\tt \verb"{" \verb"}"}
 \meta{string element} \: \meta{any character other than \doublequote{} or \backwhack}
  \> \| \backwhack{}a \| \backwhack{}b \| \backwhack{}t \| \backwhack{}n \| \backwhack{}v \| \backwhack{}f \| \backwhack{}r
  \>  \| \backwhack\doublequote{} \| \backwhack\backwhack 
- \>  \| \backwhack\meta{intraline whitespace}\meta{line ending}
- \>  \hspace*{4em}\meta{intraline whitespace}
+ \>  \| \backwhack\arbno{\meta{intraline whitespace}}\meta{line ending}
+ \>  \hspace*{4em}\arbno{\meta{intraline whitespace}}
  \>  \| \meta{inline hex escape}
 \meta{intraline whitespace} \: \meta{character tabulation}
 \> \| \meta{any character whose category is Zs}%
@@ -215,6 +215,8 @@ should be replicated for \hbox{$R = 2, 8, 10,$}
 and $16$.  There are no rules for \meta{decimal $2$}, \meta{decimal
 $8$}, and \meta{decimal $16$}, which means that number representations containing
 decimal points or exponents must be in decimal radix.
+
+In the following rules, case is insignificant.
 
 \begin{grammar}%
 \meta{number} \: \meta{num $2$} \| \meta{num $8$}
@@ -246,7 +248,6 @@ decimal points or exponents must be in decimal radix.
          \meta{uinteger $10$} \meta{suffix}
    \> \| . \atleastone{\meta{digit $10$}} \meta{suffix}
    \> \| \atleastone{\meta{digit $10$}} . \arbno{\meta{digit $10$}} \meta{suffix}
-   \> \| \atleastone{\meta{digit $10$}} . \meta{suffix}
 \meta{uinteger $R$} \: \atleastone{\meta{digit $R$}}
 \meta{prefix $R$} \: %
          \meta{radix $R$} \meta{exactness}
@@ -256,17 +257,17 @@ decimal points or exponents must be in decimal radix.
 \begin{grammar}%
 \meta{suffix} \: \meta{empty} 
    \> \| \meta{exponent marker} \meta{sign} \atleastone{\meta{digit $10$}}
-\meta{exponent marker} \: e \| E \| s \| S \| f \| F
-   \> \| d \| D \| l \| L
+\meta{exponent marker} \: e \| s \| f
+   \> \| d \| l
 \meta{mantissa width} \: \meta{empty}
    \> \| | \atleastone{\meta{digit 10}}
 \meta{sign} \: \meta{empty}  \| + \|  -
 \meta{exactness} \: \meta{empty}
-   \> \| \#i\sharpindex{i} \| \#I \| \#e\sharpindex{e} \| \#E
-\meta{radix 2} \: \#b\sharpindex{b} \| \#B
-\meta{radix 8} \: \#o\sharpindex{o} \| \#O
-\meta{radix 10} \: \meta{empty} \| \#d \| \#D
-\meta{radix 16} \: \#x\sharpindex{x} \| \#X
+   \> \| \#i\sharpindex{i} \| \#e\sharpindex{e}
+\meta{radix 2} \: \#b\sharpindex{b}
+\meta{radix 8} \: \#o\sharpindex{o}
+\meta{radix 10} \: \meta{empty} \| \#d
+\meta{radix 16} \: \#x\sharpindex{x}
 \meta{digit 2} \: 0 \| 1
 \meta{digit 8} \: 0 \| 1 \| 2 \| 3 \| 4 \| 5 \| 6 \| 7
 \meta{digit 10} \: \meta{digit}
@@ -290,7 +291,7 @@ character of Scheme.
 \subsection{Whitespace and comments}
 \label{whitespaceandcomments}
 
-\defining{Whitespace} characters are spaces, linefeeds,
+\textit{Whitespace}\index{whitespace} characters are spaces, linefeeds,
 carriage returns, character tabulations, form feeds, line tabulations,
 and any other character whose category is Zs, Zl, or Zp.
 Whitespace is used for improved readability and
@@ -461,7 +462,8 @@ a lexical syntax violation.)
 
 Case is significant in \sharpsign\backwhack\hyper{character}, and in
 \sharpsign\backwhack{\rm$\langle$character name$\rangle$}, % \hyper doesn't allow a linebreak
-but not in {\cf\sharpsign\backwhack{}x}\meta{hex scalar value}.  
+but not in the \meta{hex scalar value} part of
+{\cf\sharpsign\backwhack{}x}\meta{hex scalar value}.
 A \meta{character} must be followed by a \meta{delimiter} or by the end of the input.
 This rule resolves various ambiguous cases involving named characters,
 requiring, for
@@ -641,7 +643,8 @@ significand.
 The literals {\cf +inf.0} and {\cf -inf.0} represent positive and
 negative infinity, respectively.  The {\cf +nan.0}
 literal represents the NaN that is the result of {\cf (/ 0.0 0.0)},
-and may represent other NaNs as well.
+and may represent other NaNs as well.  The {\cf -nan.0} literal also
+represents a NaN.
 
 If \var{x} is an external representation of an inexact real number
 object and

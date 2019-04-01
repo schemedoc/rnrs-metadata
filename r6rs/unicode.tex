@@ -1,8 +1,6 @@
 \chapter{Unicode}
 \label{unicodechapter}
 
-\newcommand{\latingreek}[1]{\texonly\mathit{#1}\endtexonly\htmlonly\textit{#1}\endhtmlonly}
-
 The procedures exported by the \defrsixlibrary{unicode}
 library provide access to some aspects
 of the Unicode semantics for characters and strings:
@@ -38,8 +36,12 @@ Finally, if the character has a case-folded character,
 then {\cf char-foldcase} returns that character.
 Otherwise the character returned is the same
 as the argument.
-For Turkic characters \.I ({\tt \#\backwhack{}x130})
-and \i{} ({\tt \#\backwhack{}x131}),
+For Turkic characters
+\texonly\.I\endtexonly\htmlonly\rawhtml&#x130;\endrawhtml\endhtmlonly
+~({\tt \#\backwhack{}x130})
+and
+\texonly\i{}\endtexonly\htmlonly\rawhtml&#x131;\endrawhtml\endhtmlonly
+~({\tt \#\backwhack{}x131}),
 {\cf char-foldcase} behaves as the identity function; otherwise 
 {\cf char-foldcase} is the
 same as {\cf char-downcase} composed with {\cf char-upcase}.
@@ -180,8 +182,8 @@ The {\cf string-upcase} procedure converts a string to upper case;
   string-foldcase} procedure converts the string to its case-folded
 counterpart, using the full case-folding mapping, but without the
 special mappings for Turkic languages.  The {\cf string-titlecase}
-procedure converts the first cased character of each word via {\cf
-  char-titlecase}, and downcases all other cased characters.
+procedure converts the first cased character of each word,
+and downcases all other cased characters.
 
 \begin{scheme}
 (string-upcase "Hi") \ev "HI"
@@ -196,27 +198,26 @@ procedure converts the first cased character of each word via {\cf
 (string-downcase "$\Sigma$") \ev "$\sigma$"
 
 ; \textrm{Chi Alpha Omicron Sigma}:
-(string-upcase "$\latingreek{XAO}\Sigma$") \ev "$\latingreek{XAO}\Sigma$" 
-(string-downcase "$\latingreek{XAO}\Sigma$") \ev "$\chi\alpha{}o\varsigma$"
-(string-downcase "$\latingreek{XAO}\Sigma\Sigma$") \ev "$\chi\alpha{}o\sigma\varsigma$"
-(string-downcase "$\latingreek{XAO}\Sigma~\Sigma$") \ev "$\chi\alpha{}o\varsigma~\sigma$"
-(string-foldcase "$\latingreek{XAO}\Sigma\Sigma$") \ev "$\chi\alpha{}o\sigma\sigma$"
-(string-upcase "$\chi\alpha{}o\varsigma$") \ev "$\latingreek{XAO}\Sigma$"
-(string-upcase "$\chi\alpha{}o\sigma$") \ev "$\latingreek{XAO}\Sigma$"
+(string-upcase "\texonly$\mathit{XAO}\Sigma$\endtexonly\htmlonly\rawhtml&#x03A7;&#x0391;&#x039F;&#x03A3;\endrawhtml\endhtmlonly") \ev "\texonly$\mathit{XAO}\Sigma$\endtexonly\htmlonly\rawhtml&#x03A7;&#x0391;&#x039F;&#x03A3;\endrawhtml\endhtmlonly"
+(string-downcase "\texonly$\mathit{XAO}\Sigma$\endtexonly\htmlonly\rawhtml&#x03A7;&#x0391;&#x039F;&#x03A3;\endrawhtml\endhtmlonly") \ev "\texonly$\chi\alpha{}o\varsigma$\endtexonly\htmlonly\rawhtml&#x03C7;&#x03B1;&#x03BF;&#x03C2;\endrawhtml\endhtmlonly"
+(string-downcase "\texonly$\mathit{XAO}\Sigma\Sigma$\endtexonly\htmlonly\rawhtml&#x03A7;&#x0391;&#x039F;&#x03A3;&#x03A3;\endrawhtml\endhtmlonly") \ev "\texonly$\chi\alpha{}o\sigma\varsigma$\endtexonly\htmlonly\rawhtml&#x03C7;&#x03B1;&#x03BF;&#x03C3;&#x03C2;\endrawhtml\endhtmlonly"
+(string-downcase "\texonly$\mathit{XAO}\Sigma~\Sigma$\endtexonly\htmlonly\rawhtml&#x03A7;&#x0391;&#x039F;&#x03A3; &#x03A3;\endrawhtml\endhtmlonly") \ev "\texonly$\chi\alpha{}o\varsigma~\sigma$\endtexonly\htmlonly\rawhtml&#x03C7;&#x03B1;&#x03BF;&#x03C2; &#x03C3;\endrawhtml\endhtmlonly"
+(string-foldcase "\texonly$\mathit{XAO}\Sigma\Sigma$\endtexonly\htmlonly\rawhtml&#x03A7;&#x0391;&#x039F;&#x03A3;&#x03A3;\endrawhtml\endhtmlonly") \ev "\texonly$\chi\alpha{}o\sigma\sigma$\endtexonly\htmlonly\rawhtml&#x03C7;&#x03B1;&#x03BF;&#x03C3;&#x03C3;\endrawhtml\endhtmlonly"
+(string-upcase "\texonly$\chi\alpha{}o\varsigma$\endtexonly\htmlonly\rawhtml&#x03C7;&#x03B1;&#x03BF;&#x03C2;\endrawhtml\endhtmlonly") \ev "\texonly$\mathit{XAO}\Sigma$\endtexonly\htmlonly\rawhtml&#x03A7;&#x0391;&#x039F;&#x03A3;\endrawhtml\endhtmlonly"
+(string-upcase "\texonly$\chi\alpha{}o\sigma$\endtexonly\htmlonly\rawhtml&#x03C7;&#x03B1;&#x03BF;&#x03C3;\endrawhtml\endhtmlonly") \ev "\texonly$\mathit{XAO}\Sigma$\endtexonly\htmlonly\rawhtml&#x03A7;&#x0391;&#x039F;&#x03A3;\endrawhtml\endhtmlonly"
 
 (string-titlecase "kNock KNoCK")
 \ev "Knock Knock"
 (string-titlecase "who's there?")
 \ev "Who's There?"
-(string-titlecase "r6rs") \ev "R6Rs"
-(string-titlecase "R6RS") \ev "R6Rs"%
+(string-titlecase "r6rs") \ev "R6rs"
+(string-titlecase "r6rs") \ev "R6rs"%
 \end{scheme}
 
 \begin{note}
   The case mappings needed for implementing these procedures
   can be extracted from {\cf UnicodeData.txt}, {\cf
-    SpecialCasing.txt}, {\cf WordBreakProperty.txt} 
-  (the ``MidLetter'' property partly defines case-ignorable characters), 
+    SpecialCasing.txt}, {\cf WordBreakProperty.txt},
   and {\cf CaseFolding.txt} from the Unicode Consortium.
 
   Since these procedures are locale-independent, they may not
@@ -248,7 +249,7 @@ operate on the case-folded versions of the strings.
 \ev \schtrue
 (string-ci=? "Stra\ss{}e" "STRASSE")
 \ev \schtrue
-(string-ci=? "$\latingreek{XAO}\Sigma$" "$\chi\alpha{}o\sigma$")
+(string-ci=? "\texonly$\mathit{XAO}\Sigma$\endtexonly\htmlonly\rawhtml&#x03A7;&#x0391;&#x039F;&#x03A3;\endrawhtml\endhtmlonly" "\texonly$\chi\alpha{}o\sigma$\endtexonly\htmlonly\rawhtml&#x03C7;&#x03B1;&#x03BF;&#x03C3;\endrawhtml\endhtmlonly")
 \ev \schtrue%
 \end{scheme}
 

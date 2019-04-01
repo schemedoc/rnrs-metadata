@@ -149,7 +149,9 @@ which models a damped oscillator.
                  (newline)
                  (write (head s))
                  (loop (tail s)))))
-  (loop the-states))%
+  (loop the-states))
+
+(close-output-port (current-output-port))%
 \end{schemenoindent}
 
 This prints output like the following:

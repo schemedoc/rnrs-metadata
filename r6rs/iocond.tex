@@ -167,7 +167,7 @@ non-existent named file under the assumption that it existed.
 
 \begin{entry}{%
 \ctproto{i/o-port}
-\proto{make-i/o-port-error}{ port}{procedure}
+\proto{make-i/o-port-error}{ pobj}{procedure}
 \proto{i/o-port-error?}{ obj}{procedure}
 \proto{i/o-error-port}{ condition}{procedure}}
 
@@ -176,12 +176,12 @@ This condition type could be defined by
 \begin{scheme}
 (define-condition-type \&i/o-port \&i/o
   make-i/o-port-error i/o-port-error?
-  (port i/o-error-port))%
+  (pobj i/o-error-port))%
 \end{scheme}
 
 This condition type specifies the port with which an I/O
 error is associated. 
-\var{Port} should be the port.
+\var{Pobj} should be the port.
 Conditions raised by procedures accepting a port as an argument should
 include an {\cf\&i/o-port-error} condition.
 \end{entry}

@@ -46,7 +46,7 @@ the universe of its argument, as an enumeration set.
 Returns a unary procedure that, given a symbol
 that is in the universe of \var{enum-set}, returns its 0-origin index
 within the canonical ordering of the symbols in the universe; given a
-value not in the universe, the unary procedure returns \schfalse.
+symbol not in the universe, the unary procedure returns \schfalse.
 
 \begin{scheme}
 (let* ((e (make-enumeration '(red green blue)))
@@ -179,7 +179,8 @@ Projects \vari{enum-set} into the universe
 of \varii{enum-set}, dropping any elements of \vari{enum-set} that do
 not belong to the universe of \varii{enum-set}.  (If \vari{enum-set}
 is a subset of the universe of its second, no elements are
-dropped, and the injection is returned.)
+dropped, and the injection is returned.)  The result has the enumeration type of
+\varii{enum-set}.
 
 \begin{scheme}
 (let ((e1 (make-enumeration
@@ -187,7 +188,7 @@ dropped, and the injection is returned.)
       (e2 (make-enumeration
             '(red black white))))
   (enum-set->list
-    (enum-set-projection e1 e2))))
+    (enum-set-projection e1 e2)))
 \ev (red black)
 \end{scheme}
 \end{entry}

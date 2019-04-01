@@ -181,7 +181,7 @@ A \hyper{sub-version reference} has one of the following forms:
 
 A \hyper{sub-version reference} of the first form matches a
 \hyper{sub-version} if it is equal to it.  A {\cf >=}
-\hyper{sub-version reference} of the first form matches a sub-version
+\hyper{sub-version reference} form matches a sub-version
 if it is greater or equal to the \hyper{sub-version} following it;
 analogously for {\cf <=}.  An {\cf and} \hyper{sub-version reference}
 matches a sub-version if all of the subsequent \hyper{sub-version
@@ -272,7 +272,7 @@ have the following form:
 \end{scheme}
 
 When {\cf begin}, {\cf let-syntax}, or {\cf letrec-syntax} forms
-occur in a top-level body prior to the first
+occur in a library body prior to the first
 expression, they are spliced into the body; see section~\ref{begin}.
 Some or all of the body, including portions wrapped in {\cf begin},
 {\cf let-syntax}, or {\cf letrec-syntax}
@@ -474,7 +474,8 @@ Examples for various \hyper{import~spec}s and \hyper{export~spec}s:
 \begin{scheme}
 (library (stack)
   (export make push! pop! empty!)
-  (import (rnrs))
+  (import (rnrs)
+          (rnrs mutable-pairs))
 
   (define (make) (list '()))
   (define (push! s v) (set-car! s (cons v (car s))))

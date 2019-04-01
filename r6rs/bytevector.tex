@@ -132,7 +132,7 @@ It returns \schfalse{} otherwise.
 \end{entry}
 
 \begin{entry}{%
-\proto{bytevector-fill!}{ bytevector fill}}
+\proto{bytevector-fill!}{ bytevector fill}{procedure}}
 
 \domain{The \var{fill} argument is as in the description of the {\cf
     make-bytevector} procedure.}
@@ -163,7 +163,7 @@ and returns \unspecifiedreturn.  Analogous to {\cf vector-fill!}.
    
   The {\cf bytevector-copy!} procedure copies the bytes from \var{source} at indices 
   \begin{displaymath}
-     \var{source-start}, \ldots \var{source-start} + \var{k} - 1
+     \var{source-start}, \ldots, \var{source-start} + \var{k} - 1
   \end{displaymath}
   to consecutive indices in \var{target} starting at \var{target-index}.
    
@@ -324,8 +324,8 @@ The \ldots{\cf -set!} procedures return \unspecifiedreturn.
   integer objects in the interval $\{0, \ldots, 256^{\mathit{size}}-1\}$.  For
   {\cf sint-list->bytevector}, \var{list} must be a list of exact
   integer objects in the interval $\{-256^{\mathit{size}}/2, \ldots,
-  256^{\mathit{size}}/2-1\}$.  The length of \var{bytevector} or,
-  respectively, of \var{list} must be divisible by \var{size}.}
+  256^{\mathit{size}}/2-1\}$.  The length of \var{bytevector} 
+  must be divisible by \var{size}.}
    
 These procedures convert between lists of integer objects and their consecutive
 representations according to \var{size} and \var{endianness} in the
@@ -412,7 +412,7 @@ The \ldots{\cf -set!} procedures return \unspecifiedreturn.
   object in
   the interval $\{0, \ldots, 2^{32}-1\}$.  For {\cf bytevector-s32-set!}
   and {\cf bytevector-s32-native-set!}, \var{n} must be an exact
-  integer object in the interval $\{-2^{31}, \ldots, 2^{32}-1\}$.}
+  integer object in the interval $\{-2^{31}, \ldots, 2^{31}-1\}$.}
    
 These retrieve and set four-byte representations of numbers at indices $\var{k},
 \ldots, \var{k}+ 3$, according to the endianness specified by \var{endianness}. The
@@ -456,7 +456,7 @@ The \ldots{\cf{}-set!} procedures return \unspecifiedreturn.
   object in
   the interval $\{0, \ldots, 2^{64}-1\}$.  For {\cf bytevector-s64-set!}
   and {\cf bytevector-s64-native-set!}, \var{n} must be an exact
-  integer object in the interval $\{-2^{63}, \ldots, 2^{64}-1\}$.}
+  integer object in the interval $\{-2^{63}, \ldots, 2^{63}-1\}$.}
    
 These retrieve and set eight-byte representations of numbers at
 indices $\var{k}, \ldots, \var{k}+ 7$, according to the endianness
@@ -597,13 +597,14 @@ sequence is encoded by the given bytevector.
 \proto{utf16->string}{ bytevector endianness}{procedure}
 \pproto{(utf16->string \var{bytevector}}{procedure}}
 {\tt\obeyspaces\\
-    \var{endianness} \var{endianness-mandatory})}
+    \var{endianness} \var{endianness-mandatory?})}
 
 \domain{\var{Endianness} must be the symbol {\cf big} or
   the symbol {\cf little}.} The {\cf utf16->string} procedure returns
 a newly allocated (unless empty) string whose character sequence is
-encoded by the given bytevector.  \var{Bytevector} is decoded
-according to UTF-16BE or UTF-16LE: If \var{endianness-mandatory?} is
+encoded by the given bytevector.  \var{Bytevector} is decoded according
+to UTF-16, UTF-16BE, UTF-16LE, or a fourth encoding scheme that differs from
+all three of those as follows: If \var{endianness-mandatory?} is
 absent or \schfalse, {\cf utf16->string} determines the endianness
 according to a UTF-16 BOM at the beginning of \var{bytevector} if a
 BOM is present; in this case, the BOM is not decoded as a character.
@@ -624,13 +625,14 @@ encoding is decoded as a regular character.
 \proto{utf32->string}{ bytevector endianness}{procedure}
 \pproto{(utf32->string \var{bytevector}}{procedure}}
 {\tt\obeyspaces\\
-    \var{endianness} \var{endianness-mandatory})}
+    \var{endianness} \var{endianness-mandatory?})}
 
 \domain{\var{Endianness} must be the symbol {\cf big} or
   the symbol {\cf little}.} The {\cf utf32->string} procedure returns
 a newly allocated (unless empty) string whose character sequence is
-encoded by the given bytevector.  \var{Bytevector} is decoded
-according to UTF-32BE or UTF-32LE: If \var{endianness-mandatory?} is
+encoded by the given bytevector.  \var{Bytevector} is decoded according
+to UTF-32, UTF-32BE, UTF-32LE, or a fourth encoding scheme that differs from
+all three of those as follows: If \var{endianness-mandatory?} is
 absent or \schfalse, {\cf utf32->string} determines the endianness
 according to a UTF-32 BOM at the beginning of \var{bytevector} if a
 BOM is present; in this case, the BOM is not decoded as a character.

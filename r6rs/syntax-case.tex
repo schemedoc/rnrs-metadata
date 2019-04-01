@@ -120,8 +120,15 @@ substitution.
 Marks applied after a substitution, i.e., appear over the substitution in
 the wrap, are not relevant and are ignored.
 
-An algebra that defines how marks and substitutions work more precisely is
-given in section~2.4 of Oscar Waddell's PhD thesis~\cite{Waddellphd}.
+An algebra that defines how marks and substitutions work more
+precisely is given in section~2.4 of Oscar Waddell's PhD
+thesis~\cite{Waddellphd}.\footnote{Note, however, that Waddell's
+  thesis describes slightly different semantics for {\cf
+    bound-identifier=?}---it specifies that for two identifiers to be
+  equal in the sense of {\cf
+    bound-identifier=?}, they must have the same marks and be equal in
+  the sense of {\cf free-identifier=?}, whereas this report requires
+  instead that they must have the same marks and have the same name.}
 
 \section{Syntax objects}
 \label{syntaxobjectssection}
@@ -505,7 +512,7 @@ p.car \ev 4
         [\_  \#'(car p)]))))
 (set! p.car 15)
 p.car           \ev 15
-p               \ev (15 5)%
+p               \ev (15 . 5)%
 \end{scheme}
 
 \section{Identifier predicates}
@@ -792,7 +799,7 @@ Scheme form, as demonstrated by the following definition of
   (lambda (x)
     (define read-file
       (lambda (fn k)
-        (let ([p (open-file-input-port fn)])
+        (let ([p (open-file-input-port fn (file-options) (buffer-mode block) (native-transcoder))])
           (let f ([x (get-datum p)])
             (if (eof-object? x)
                 (begin (close-port p) '())
@@ -1067,20 +1074,21 @@ follows.
 
 \begin{schemenoindent}
 (define-syntax identifier-syntax
-  (syntax-rules (set!)
-    [(\_ e)
-     (lambda (x)
-       (syntax-case x ()
-         [id (identifier? \#'id) \#'e]
-         [(\_ x (... ...)) \#'(e x (... ...))]))]
-    [(\_ (id exp1) ((set! var val) exp2))
-     (and (identifier? \#'id) (identifier? \#'var))
-     (make-variable-transformer
-       (lambda (x)
-         (syntax-case x (set!)
-           [(set! var val) \#'exp2]
-           [(id x (... ...)) \#'(exp1 x (... ...))]
-           [id (identifier? \#'id) \#'exp1])))]))%
+  (lambda (x)
+    (syntax-case x (set!)
+      [(\_ e)
+       \#'(lambda (x)
+           (syntax-case x ()
+             [id (identifier? \#'id) \#'e]
+             [(\_ x (... ...)) \#'(e x (... ...))]))]
+      [(\_ (id exp1) ((set! var val) exp2))
+       (and (identifier? \#'id) (identifier? \#'var))
+       \#'(make-variable-transformer
+          (lambda (x)
+            (syntax-case x (set!)
+              [(set! var val) \#'exp2]
+              [(id x (... ...)) \#'(exp1 x (... ...))]
+              [id (identifier? \#'id) \#'exp1])))])))
 \end{schemenoindent}
 \end{note}
 
@@ -1118,10 +1126,8 @@ chapter~\ref{exceptionsconditionschapter}) has the following condition types:
 %
 \begin{itemize}
 \item If \var{who} is not \schfalse{} or can be inferred, the condition has condition type
-  {\cf \&who}, with \var{who} as the value of its field.  In
-  that case, \var{who} should identify the procedure or entity that
-  detected the exception.  If it is \schfalse, the condition does not
-  have condition type {\cf \&who}.
+  {\cf \&who}, with \var{who} as the value of its field.
+  Otherwise, the condition does not have condition type {\cf \&who}.
 \item The condition has condition type {\cf \&message}, with
   \var{message} as the value of its field.
 \item The condition has condition type {\cf \&syntax} 

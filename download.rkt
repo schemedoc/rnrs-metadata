@@ -72,7 +72,8 @@
 
 (download-and-extract
  "r6rs"
- "http://www.r6rs.org/final/r6rs.tar.gz"
+ ;;"http://www.r6rs.org/final/r6rs.tar.gz"
+ "https://github.com/schemedoc/r6rs/archive/master.tar.gz"
  "document")
 
 (download-and-extract

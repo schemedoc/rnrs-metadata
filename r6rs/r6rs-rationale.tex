@@ -16,7 +16,7 @@
 \endtexonly
 
 \def\headertitle{Revised$^{\rnrsrevision}$ Scheme Rationale}
-\def\TZPtitle{Revised^\rnrsrevision{} Report on the Algorithmic Language Scheme - Non-Normative Appendices -}
+\def\TZPtitle{Revised^\rnrsrevision{} Report on the Algorithmic Language Scheme - Rationale -}
 
 \begin{document}
 
@@ -1538,7 +1538,10 @@ other primitive data types such as pairs.
 The goals of the exception mechanism are to help programmers share
 code which relies on exception handling, and to provide information on
 violations of specifications of procedures and syntactic forms.  This
-exception mechanism is an extension of SRFI~34~\cite{srfi34}, which
+exception mechanism is a extension of
+SRFI~34~\cite{srfi34}\footnote{There is also a small different to
+  SRFI~34, namely that {\cf guard} calls {\cf raise-continuable}
+  instead of {\cf raise} when re-raising an exception.}, which
 was primarily designed to meet the first goal.  However, it has proven
 suitable for addressing the second goal of dealing with violations as
 well.   (More on the second goal below in the discussion of the
@@ -1625,7 +1628,7 @@ flags.
 
 \section{End-of-line styles}
 
-The set of end-of-line styles recognized by the \rsixlibrary{ports}
+The set of end-of-line styles recognized by the \rsixlibrary{io ports}
 library is not closed, because end-of-line styles other than those
 listed might become commonplace in the future.
 

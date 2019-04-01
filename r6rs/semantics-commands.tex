@@ -5,13 +5,13 @@
 \usepackage{stmaryrd}
 
 \newcounter{subfig}
-\newcommand{\subfigurestart}{\renewcommand{\thefigure}{A.\arabic{figure}\alph{subfig}}\setcounter{subfig}{1}}
+\newcommand{\subfigurestart}{\texonly\renewcommand{\thefigure}{A.\arabic{figure}\alph{subfig}}\setcounter{subfig}{1}\endtexonly}
 
 
 % needed for the second thru the nth figure
-\newcommand{\subfigureadjust}{\addtocounter{figure}{-1}\addtocounter{subfig}{1}}
+\newcommand{\subfigureadjust}{\texonly\addtocounter{figure}{-1}\addtocounter{subfig}{1}\endtexonly}
 
-\newcommand{\subfigurestop}{\renewcommand{\thefigure}{A.\arabic{figure}}}
+\newcommand{\subfigurestop}{\texonly\renewcommand{\thefigure}{A.\arabic{figure}}\endtexonly}
 
 
 \newcommand{\semanticsindex}[2]{\index{#1@{\texttt{#1} (formal semantics)}}}
@@ -58,6 +58,10 @@
 \imgdef\calRv{\ensuremath{\mathcal{R}_v}}
 \imgdef\calA{\ensuremath{\mathcal{A}}}
 \imgdef\scrO{\ensuremath{\mathscr{O}}}
+\imgdef\scrR{\ensuremath{\mathscr{R}}}
+\imgdef\scrQ{\ensuremath{\mathscr{Q}}}
+\imgdef\scrT{\ensuremath{\mathscr{T}}}
+\imgdef\scrS{\ensuremath{\mathscr{S}}}
 
 \newcommand{\semfalse}{\texttt{\#f}}
 \newcommand{\semtrue}{\texttt{\#t}}

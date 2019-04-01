@@ -235,7 +235,7 @@ Returns the default end-of-line style of the underlying platform, e.g.,
 
 \begin{entry}{%
 \ctproto{i/o-decoding}
-\proto{make-i/o-decoding-error}{ port}{procedure}
+\proto{make-i/o-decoding-error}{ pobj}{procedure}
 \proto{i/o-decoding-error?}{ obj}{procedure}}
 
 This condition type could be defined by
@@ -256,7 +256,7 @@ the invalid encoding.
 
 \begin{entry}{% 
 \ctproto{i/o-encoding}
-\proto{make-i/o-encoding-error}{ port char}{procedure}
+\proto{make-i/o-encoding-error}{ pobj cobj}{procedure}
 \proto{i/o-encoding-error?}{ obj}{procedure}
 \proto{i/o-encoding-error-char}{ condition}{procedure}}
 
@@ -265,13 +265,13 @@ This condition type could be defined by
 \begin{scheme}
 (define-condition-type \&i/o-encoding \&i/o-port
   make-i/o-encoding-error i/o-encoding-error?
-  (char i/o-encoding-error-char))%
+  (cobj i/o-encoding-error-char))%
 \end{scheme}
 
 An exception with this type is raised when one of the operations for
 textual output to a port encounters a character that cannot be
 translated into bytes by the output direction of the port's transcoder.
-\var{Char} is the character that could not be encoded.
+\var{Cobj} should be the character that could not be encoded.
 \end{entry}
 
 \begin{entry}{%
@@ -280,7 +280,7 @@ translated into bytes by the output direction of the port's transcoder.
 \domain{\hyper{Error-handling-mode symbol} should be a symbol whose
   name is one of {\cf ignore}, {\cf raise}, and {\cf replace}.} The
 form evaluates to the corresponding symbol.  If
-\var{error-handling-mode symbol} is not one of these identifiers,
+\hyper{error-handling-mode symbol} is not one of these identifiers,
 effect and result are implementation-dependent: The result may be an
 error-handling-mode symbol acceptable as a \var{handling-mode}
 argument to {\cf make-transcoder}.  If it is not acceptable as a
@@ -777,6 +777,15 @@ them as part of an I/O operation requested by the program.  The
 implementation is not required to check that these procedures
 otherwise behave as described.  If they do not, however, the behavior
 of the resulting port is unspecified.
+
+\begin{note}
+  Even when the \var{get-position} procedure is supplied, the
+  {\cf port-position} procedure cannot generally return a precise
+  value for a custom textual input port if data has been
+  read from the port.  Therefore, it is likely that this entry will
+  change in a future version of the report.
+\end{note}
+
 \end{entry}
 
 \subsection{Binary input}\unsection
@@ -821,7 +830,8 @@ any bytes are available, {\cf get-bytevector-n} returns the end-of-file object.
 \mainschindex{get-bytevector-n!}{\tt\obeyspaces\\
     \var{bytevector} \var{start} \var{count})}
 
-\domain{\var{Count} must be an exact, non-negative integer object, representing
+\domain{\var{Start} and \var{count} must be exact, non-negative
+  integer objects, with \var{count} representing
   the number of bytes to be read. \var{bytevector} must be a bytevector
   with at
   least $\var{start} + \var{count}$ elements.}
@@ -860,7 +870,8 @@ of file is reached, the end-of-file object is returned.
 Attempts to read all bytes until the next end of file, blocking as
 necessary. If one or more bytes are read, {\cf get-bytevector-all} returns
 a bytevector
-containing all bytes up to the next end of file.  Otherwise, {\cf
+containing all bytes up to the next end of file and updates
+\var{binary-input-port} to point just past these bytes.  Otherwise, {\cf
   get-bytevector-all} returns the end-of-file object.
 The operation may block indefinitely waiting to see if more bytes
 will become available, even if some bytes are already available.
@@ -1187,9 +1198,7 @@ should behave as specified in the description of
   The \var{write!} procedure should write up to \var{count} bytes
   from \var{bytevector} starting at index \var{start} 
   to the byte sink.
-  If \var{count} is 0, the \var{write!} procedure should
-  have the effect of passing an end-of-file object to the byte sink.
-  In any case, the \var{write!} procedure should return the number of
+  The \var{write!} procedure should return the number of
   bytes that it wrote, as an exact integer object.
 \end{itemize}
 
@@ -1228,9 +1237,7 @@ should behave as specified in the description of
   The \var{write!} procedure should write up to \var{count} characters
   from \var{string} starting at index \var{start} 
   to the character sink.
-  If \var{count} is 0, the \var{write!} procedure should
-  have the effect of passing an end-of-file object to the character sink.
-  In any case, the \var{write!} procedure should return the number of
+  The \var{write!} procedure should return the number of
   characters that it wrote, as an exact integer object.
 \end{itemize}
 
@@ -1361,6 +1368,14 @@ Each of the remaining arguments may be \schfalse{}; if any of
 those arguments is not \schfalse{}, it must be a procedure and
 should behave as specified in the description of
 {\cf make-custom-binary-input-port}.
+
+\begin{note}
+  Unless both \var{get-position} and \var{set-position!} procedures are
+  supplied, a put operation cannot precisely position the port for output
+  to a custom binary input/output port after data has been read from
+  the port.  Therefore, it is likely that this entry will
+  change in a future version of the report.
+\end{note}
 \end{entry}
 
 \begin{entry}{%
@@ -1383,6 +1398,15 @@ Each of the remaining arguments may be \schfalse{}; if any of
 those arguments is not \schfalse{}, it must be a procedure and
 should behave as specified in the description of
 {\cf make-custom-textual-input-port}.
+
+\begin{note}
+  Even when both \var{get-position} and \var{set-position!} procedures are
+  supplied, the {\cf port-position} procedure cannot generally return a
+  precise value for a custom textual input/output port, and a put operation
+  cannot precisely position the port for output, after data has
+  been read from the port. Therefore, it is likely that this entry will
+  change in a future version of the report.
+\end{note}
 \end{entry}
 
 

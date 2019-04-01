@@ -135,9 +135,6 @@ All bindings established by a set of definitions, whether
 keyword or variable definitions, are visible within the definitions
 themselves.
 
-\implresp The implementation should detect if the value of
-\hyper{expression} cannot possibly be a transformer.
-
 Example:
 
 \begin{scheme}
@@ -150,6 +147,9 @@ Example:
       ((odd?  x) (not (even? x)))))
   (even? 10))                       \ev \schtrue{}%
 \end{scheme}
+
+\implresp The implementation should detect if the value of
+\hyper{expression} cannot possibly be a transformer.
 
 An implication of the left-to-right processing order
 (section~\ref{expansionchapter}) is that one definition can
@@ -294,7 +294,7 @@ The results of the last expression in the body are returned as
 the results of the procedure call.
 
 \begin{scheme}
-(lambda (x) (+ x x))      \ev  {\em{}a procedure}
+(lambda (x) (+ x x))      \ev  \textnormal{\textit{a procedure}}
 ((lambda (x) (+ x x)) 4)  \ev  8
 
 ((lambda (x)
@@ -523,7 +523,7 @@ otherwise the {\cf case} expression returns \unspecifiedreturn.
 \begin{scheme}
 (case (* 2 3)
   ((2 3 5 7) 'prime)
-  ((1 4 6 8 9) 'composite))     \ev  composite
+  ((4 6 8 9) 'composite))     \ev  composite
 (case (car '(c d))
   ((a) 'a)
   ((b) 'b))                     \ev  \theunspecified
@@ -956,7 +956,7 @@ context:
 
 (begin (display "4 plus 1 equals ")
        (display (+ 4 1)))      \ev  \unspecified
- \>{\em and prints}  4 plus 1 equals 5%
+ \>\textnormal{\textit{and prints}}  4 plus 1 equals 5%
 \end{scheme}
 \end{entry}
 
@@ -1002,7 +1002,8 @@ The {\cf eqv?} procedure returns \schtrue{} if one of the following holds:
   yield the same results (in the sense of {\cf eqv?}) when passed
   as arguments to any other procedure that can be defined
   as a finite composition of Scheme's standard arithmetic
-  procedures.
+  procedures, as long as the evaluation of that application does not
+  involve NaN.
 
 \item \vari{Obj} and \varii{obj} are both characters and are the same
 character according to the {\cf char=?} procedure
@@ -1012,7 +1013,7 @@ character according to the {\cf char=?} procedure
 
 \item \vari{Obj} and \varii{obj} are objects such as pairs, vectors, bytevectors
   (library chapter~\extref{lib:bytevectorschapter}{Bytevectors}),
-  strings, hashtables, records (library
+  strings, records (library
   chapter~\extref{lib:recordschapter}{Records}), ports (library
   section~\extref{lib:portsiosection}{Port I/O}), or hashtables
   (library chapter~\extref{lib:hashtablechapter}{Hash tables}) that
@@ -1044,7 +1045,8 @@ The {\cf eqv?} procedure returns \schfalse{} if one of the following holds:
 \item \vari{Obj} and \varii{obj} yield different results (in the sense of
   {\cf eqv?}) when passed as arguments to any other procedure
   that can be defined as a finite composition of Scheme's
-  standard arithmetic procedures.
+  standard arithmetic procedures, as long as the evaluation of that
+  application does not involve NaN.
 
 \item \vari{Obj} and \varii{obj} are characters for which the {\cf char=?}
   procedure returns \schfalse{}.
@@ -1105,7 +1107,7 @@ boolean.
       (lambda (x) x))    \ev  \unspecified
 (eqv? (lambda (x) x)
       (lambda (y) y))    \ev  \unspecified
-(eqv? +nan.0 +nan.0)             \ev \unspecified%
+(eqv? +nan.0 +nan.0)             \ev  \unspecified%
 \end{scheme}
 
 The next set of examples shows the use of {\cf eqv?}\ with procedures
@@ -1144,9 +1146,6 @@ not detect this equivalence.
 
 Implementations may
 share structure between constants where appropriate.
-Furthermore, a constant may be copied at any time by the implementation so
-as to exist simultaneously in different sets of locations, as noted in
-section~\ref{quote}.
 Thus the value of {\cf eqv?} on constants is sometimes
 implementation-dependent.
 
@@ -1185,7 +1184,7 @@ from {\cf eqv?} on empty vectors, empty bytevectors, and empty strings.
 (eq? '() '())                   \ev  \schtrue
 (eq? 2 2)                       \ev  \unspecified
 (eq? \#\backwhack{}A \#\backwhack{}A) \ev  \unspecified
-(eq? car car)                   \ev  \schtrue
+(eq? car car)                   \ev  \unspecified
 (let ((n (+ 2 3)))
   (eq? n n))      \ev  \unspecified
 (let ((x '(a)))
@@ -1628,7 +1627,7 @@ inexact number objects of the appropriate type have bounded precision, then
 the value returned is an inexact number object that is nearest to the
 argument.  If an exact argument has no reasonably close inexact
 equivalent, an exception with condition type
-{\cf\&implementation-violation} may be
+{\cf\&implementation-restriction} may be
 raised.
 
 \begin{note}
@@ -1644,7 +1643,7 @@ returned is the exact number object that is numerically closest to the
 argument; in most cases, the result of this procedure should be
 numerically equal to its argument.  If an inexact argument has no
 reasonably close exact equivalent, an exception with condition type
-{\cf\&implementation-violation} may be
+{\cf\&implementation-restriction} may be
 raised.
 
 These procedures implement the natural one-to-one correspondence
@@ -1677,8 +1676,8 @@ nonincreasing, and \schfalse{} otherwise.
 For any real number object \var{x} that is neither infinite nor NaN:
 
 \begin{scheme}
-(< -inf.0 \var{x} +inf.0))        \ev  \schtrue{}
-(> +inf.0 \var{x} -inf.0))        \ev  \schtrue{}%
+(< -inf.0 \var{x} +inf.0)        \ev  \schtrue{}
+(> +inf.0 \var{x} -inf.0)        \ev  \schtrue{}%
 \end{scheme}
 
 For any number object \var{z}:
@@ -1762,7 +1761,7 @@ These procedures return the maximum or minimum of their arguments.
 (max 3.9 4)                            \ev  4.0%
 \end{scheme}
 
-For any real number object \var{x}:
+For any real number object \var{x} that is not a NaN:
 
 \begin{scheme}
 (max +inf.0 \var{x})                         \ev  +inf.0
@@ -1842,7 +1841,7 @@ consistent with the following examples:
 
 \begin{entry}{%
 \proto{-}{ z}{procedure}
-\rproto{-}{ \vari{z} \varii{z} \dotsfoo}{procedure}}
+\rproto{-}{ \vari{z} \varii{z} \variii{z} \dotsfoo}{procedure}}
 
 With two or more arguments, this procedures returns the difference of
 its arguments, associating to the left.  With one argument, however,
@@ -1875,7 +1874,7 @@ consistent with the following examples:
 
 \begin{entry}{%
 \proto{/}{ z}{procedure}
-\rproto{/}{ \vari{z} \varii{z} \dotsfoo}{procedure}}
+\rproto{/}{ \vari{z} \varii{z} \variii{z} \dotsfoo}{procedure}}
 
 \domain{If all of the arguments are exact, then the divisors must all
   be nonzero.}
@@ -1927,9 +1926,14 @@ Returns the absolute value of its argument.
 
 These procedures implement number-theoretic integer division and
 return the results of the corresponding mathematical operations
-specified in section~\ref{integerdivision}.  In each case, \vari{x}
-must be neither infinite nor a NaN, and \varii{x} must be nonzero;
-otherwise, an exception with condition type {\cf\&assertion} is raised.
+specified in section~\ref{integerdivision}.  If \vari{x} and \varii{x}
+are exact, \varii{x} must be nonzero.  In the cases where the
+mathematical requirements in section~\ref{integerdivision} cannot be
+satisfied by any number object, either an exception is raised with
+condition type {\cf\&implementation-restriction}, or unspecified
+number objects (one for {\cf div} {\cf mod}, {\cf div0} and {\cf
+  mod0}, two for {\cf div-and-mod} and {\cf div0-and-mod0}) are
+returned.
 
 \begin{scheme}
 (div \vari{x} \varii{x})         \ev \(\vari{x}~\mathrm{div}~\varii{x}\)
@@ -1937,7 +1941,7 @@ otherwise, an exception with condition type {\cf\&assertion} is raised.
 (div-and-mod \vari{x} \varii{x})     \ev \(\vari{x}~\mathrm{div}~\varii{x}, \vari{x}~\mathrm{mod}~\varii{x}\)\\\>\>\>; \textrm{two return values}
 (div0 \vari{x} \varii{x})        \ev \(\vari{x}~\mathrm{div}_0~\varii{x}\)
 (mod0 \vari{x} \varii{x})        \ev \(\vari{x}~\mathrm{mod}_0~\varii{x}\)
-(div0-and-mod0 \vari{x} \varii{x})   \lev \(\vari{x}~\mathrm{div}_0~\varii{x}, \vari{x}~\mathrm{mod}_0~\varii{x}\)\\\>\>; \textrm{two return values}%
+(div0-and-mod0 \vari{x} \varii{x})   \lev \(\vari{x}~\mathrm{div}_0~\varii{x}, \vari{x}~\mathrm{mod}_0~\varii{x}\)\\\>\>\>; \textrm{two return values}%
 \end{scheme}
 
 \begin{entry}{%
@@ -2024,7 +2028,7 @@ given a NaN.
 \begin{entry}{%
 \proto{rationalize}{ \vari{x} \varii{x}}{procedure}}
 
-The {\cf rationalize} procedure returns the a number object
+The {\cf rationalize} procedure returns a number object
 representing the {\em simplest} rational
 number differing from \vari{x} by no more than \varii{x}.    A rational number $r_1$ is
 {\em simpler} \mainindex{simplest rational} than another rational number
@@ -2145,7 +2149,7 @@ values of \vari{z} and \varii{z}, {\cf (expt \vari{z}
 (expt 5 -3)                 \ev  1/125
 (expt 5 0)                  \ev  1
 (expt 0 5)                  \ev  0
-(expt 0 5+.0000312i)        \ev  0
+(expt 0 5+.0000312i)        \ev  0.0
 (expt 0 -5)                 \ev  \unspecified
 (expt 0 -5+.0000312i)       \ev  \unspecified
 (expt 0 0)                  \ev  1
@@ -2186,7 +2190,7 @@ returns $a_3$, and {\cf (angle \var{z})} returns $a_4$.
 
 \begin{scheme}
 (real-part 1.1+2.2i)              \ev 1.1 ; \textrm{approximately}
-(imag-part 1.1+2.2i)              \ev 2.2i ; \textrm{approximately}
+(imag-part 1.1+2.2i)              \ev 2.2 ; \textrm{approximately}
 (magnitude 1.1@2.2)              \ev 1.1 ; \textrm{approximately}
 (angle 1.1@2.2)                  \ev 2.2 ; \textrm{approximately}
 
@@ -2273,7 +2277,9 @@ Returns a number object with maximally precise representation expressed by the
 given \var{string}.  \var{Radix} must be an exact integer object, either 2, 8, 10,
 or 16.  If supplied, \var{radix} is a default radix that may be overridden
 by an explicit radix prefix in \var{string} (e.g., {\tt "\#o177"}).  If \var{radix}
-is not supplied, then the default radix is 10.  If \var{string} is not
+is not supplied, then the default radix is 10.  If
+the arguments are as specified,
+ \var{string} is not
 a syntactically valid notation for a number object or a notation for a
 rational number object with a zero denominator, then {\cf string->number}
 returns \schfalse{}.
@@ -2289,8 +2295,9 @@ returns \schfalse{}.
 \end{scheme}
 
 \begin{note}
-  The {\cf string->number} procedure always returns a number object or
-  \schfalse{}; it never raises an exception.
+  If the arguments to {\cf string->number} are a string and a valid
+  radix as specified, it must produce a number object or \schfalse{};
+  it may not raise an exception.
 \end{note}
 \end{entry}
 
@@ -2495,7 +2502,7 @@ twenty-eight of these procedures in all.
 \proto{null?}{ obj}{procedure}}
 
 Returns \schtrue{} if \var{obj} is the empty list\index{empty list},
-\schfalse otherwise.
+\schfalse{} otherwise.
 
 \end{entry}
 
@@ -2540,24 +2547,28 @@ Returns the length of \var{list}.
 
 
 \begin{entry}{%
-\proto{append}{ list \dotsfoo{} obj}{procedure}}
+\proto{append}{ list \dotsfoo{} obj}{procedure}
+\rproto{append}{}{procedure}}
 
 Returns a possibly improper list consisting of the elements of the first \var{list}
 followed by the elements of the other \var{list}s, with \var{obj} as
 the cdr of the final pair.
 An improper list results if \var{obj} is not a
-list.
+list.  The {\cf append} procedure returns the empty list if called
+with no arguments.
 
 \begin{scheme}
 (append '(x) '(y))              \ev  (x y)
 (append '(a) '(b c d))          \ev  (a b c d)
 (append '(a (b)) '((c)))        \ev  (a (b) (c))
 (append '(a b) '(c . d))        \ev  (a b c . d)
-(append '() 'a)                 \ev  a%
+(append '() 'a)                 \ev  a
+(append)                        \ev  ()
+(append 'a)                     \ev a%
 \end{scheme}
 
-If {\cf append} constructs a nonempty chain of pairs, it is always
-newly allocated.  If no pairs are allocated, \var{obj} is returned.
+The return value is made from new pairs for all arguments but the
+last; the last is merely placed at the end of the new structure.
 \end{entry}
 
 
@@ -2595,7 +2606,7 @@ of pairs beyond this length.
 \proto{list-ref}{ list k}{procedure}}
 
 \domain{\var{List} must be a list whose length is at least $\var{k}+1$.}
-The {\cf list-tail} procedure returns the \var{k}th element of \var{list}.
+The {\cf list-ref} procedure returns the \var{k}th element of \var{list}.
 
 \begin{scheme}
 (list-ref '(a b c d) 2)                 \ev c%
@@ -2762,8 +2773,9 @@ Returns the symbol whose name is \var{string}.
 
 \mainindex{Unicode}
 \mainindex{scalar value}
+\mainindex{character}
 
-\defining{Characters} are objects that represent Unicode scalar
+\textit{Characters} are objects that represent Unicode scalar
 values~\cite{Unicode}.
 
 \begin{note}
@@ -3584,8 +3596,8 @@ As noted in section~\ref{abbreviationsection},
           \lev  (a 3 4 5 6 b)
 `(({\cf foo} ,(- 10 3)) ,@(cdr '(c)) . ,(car '(cons))) %
           \lev  ((foo 7) . cons)
-`\#(10 5 ,(sqrt 4) ,@(map sqrt '(16 9)) 8) %
-          \lev  \#(10 5 2 4 3 8)
+`\#(10 5 ,(- 4) ,@(map - '(16 9)) 8) %
+          \lev  \#(10 5 -4 -16 -9 8)
 (let ((name 'foo))
   `((unquote name name name)))%
           \lev (foo foo foo)
@@ -3597,7 +3609,7 @@ As noted in section~\ref{abbreviationsection},
                  (unquote (append x y) (sqrt 9)))
 (let ((x '(2 3))
       (y '(4 5)))
-  `(foo (unquote (append x y) (sqrt 9)))) \lev (foo (2 3 4 5) 3)%
+  `(foo (unquote (append x y) (- 9)))) \lev (foo (2 3 4 5) -9)%
 \end{scheme}
 
 Quasiquote forms may be nested.  Substitutions are made only for
@@ -4092,7 +4104,7 @@ replaced by \hyperii{template}.
     ((set! \_ e) (set-car! p e))))
 (set! p.car 15)
 p.car           \ev 15
-p               \ev (15 5)%
+p               \ev (15 . 5)%
 \end{scheme}
 
 \end{entry}

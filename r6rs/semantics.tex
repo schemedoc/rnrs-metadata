@@ -1,5 +1,141 @@
 %!TEX root = r6rs.tex
 
+\newcommand{\figGrammar}{
+\texonly\addtocounter{figure}{1}\endtexonly % get the figure counter in sync with the section counter
+\subfigurestart{}
+\beginfig
+\input{r6-fig-grammar-parti.tex}
+\caption{Grammar for programs and observables}\label{fig:grammar}
+\endfig
+}
+
+\newcommand{\figEcGrammar}{
+\beginfig
+\subfigureadjust{}
+\input{r6-fig-grammar-partii.tex}
+\caption{Grammar for evaluation contexts}\label{fig:ec-grammar}
+\endfig
+\subfigurestop{}
+}
+
+\newcommand{\figQuote}{
+\beginfig
+\begin{center}
+\input{r6-fig-Quote.tex}
+
+\input{r6-fig-QtocQtoic.tex}
+\end{center}
+\caption{Quote}\label{fig:quote}
+\endfig
+}
+
+\newcommand{\figMV}{
+\beginfig
+\begin{center}
+\input{r6-fig-Multiple--values--and--call-with-values.tex}
+\end{center}
+\caption{Multiple values and call-with-values}\label{fig:Multiple--values--and--call-with-values}
+\endfig
+}
+
+\newcommand{\figExceptions}{
+\beginfig
+\begin{center}
+\input{r6-fig-Exceptions}
+\end{center}
+\caption{Exceptions}\label{fig:Exceptions}
+\endfig
+}
+
+\newcommand{\figArithmetic}{
+\beginfig
+\begin{center}
+\input{r6-fig-Arithmetic.tex}
+\input{r6-fig-Basic--syntactic--forms.tex}
+\end{center}
+\caption{Arithmetic and basic forms}\label{fig:Arithmetic}
+\endfig
+}
+
+\newcommand{\figCons}{
+\beginfig
+\begin{center}
+\input{r6-fig-Cons.tex}
+\end{center}
+\caption{Lists}\label{fig:Cons}
+\endfig
+}
+
+\newcommand{\figEqv}{
+\beginfig
+\begin{center}
+\input{r6-fig-Eqv.tex}
+\end{center}
+\caption{Eqv}\label{fig:Eqv}
+\endfig
+}
+
+\newcommand{\figApplication}{
+\subfigurestart{}
+\beginfig
+\begin{center}
+\input{r6-fig-Procedure--application.tex}
+\end{center}
+\caption{Procedures \& application}\label{fig:Procedure--application}
+\endfig
+}
+
+\newcommand{\figVarsetd}{
+\beginfig
+\subfigureadjust{}
+\begin{center}
+\input{r6-fig-Var-set!d_.tex}
+\end{center}
+\caption{Variable-assignment relation}\label{fig:varsetd}
+\endfig
+}
+
+\newcommand{\figApply}{
+\beginfig
+\subfigureadjust{}
+\begin{center}
+\input{r6-fig-Apply.tex}
+\input{r6-fig-circular_.tex}
+\end{center}
+\caption{Apply}\label{fig:Apply}
+\endfig
+\subfigurestop{}
+}
+
+\newcommand{\figCallcc}{
+\beginfig
+\begin{center}
+\input{r6-fig-Call-cc--and--dynamic-wind.tex} \\
+\input{r6-fig-TrimpRepoSt.tex}
+\end{center}
+\caption{Call/cc and dynamic wind}\label{fig:Call-cc--and--dynamic-wind}
+\endfig
+}
+
+\newcommand{\figLetrec}{
+\beginfig
+\begin{center}
+\input{r6-fig-Letrec.tex}
+\end{center}
+\caption{Letrec and letrec*}
+\label{fig:Letrec}
+\endfig
+}
+
+\newcommand{\figUnderspec}{
+\beginfig
+\begin{center}
+\input{r6-fig-Underspecification.tex}
+\end{center}
+\caption{Explicitly unspecified behavior}\label{fig:Underspecification}
+\endfig
+}
+
 This appendix presents a non-normative, formal, operational semantics for Scheme, that is based on an earlier semantics~\cite{mf:scheme-op-sem}. It does not cover the entire language. The notable missing features are the macro system, I/O, and the numerical tower. The precise list of features included is given in section~\ref{sec:semantics:grammar}.
 
 The core of the specification is a single-step term rewriting relation that indicates how an (abstract) machine behaves. In general, the report is not a complete specification, giving implementations freedom to behave differently, typically to allow optimizations. This underspecification shows up in two ways in the semantics. 
@@ -87,13 +223,7 @@ Sometimes we use equality in the side-conditions; when we do it merely
 means simple term equality, i.e., the two terms must have the
 same syntactic shape.
 
-
-\addtocounter{figure}{1} % get the figure counter in sync with the section counter
-\subfigurestart{}
-\beginfig
-\input{r6-fig-grammar-parti.tex}
-\caption{Grammar for programs and observables}\label{fig:grammar}
-\endfig
+\texonly\figGrammar\endtexonly
 
 Making the evaluation context $E$ explicit in the rule allows
 us to define relations that manipulate their context. As a simple
@@ -116,12 +246,9 @@ sophisticated ways.
 
 \section{Grammar}\label{sec:semantics:grammar}
 
-\beginfig
-\subfigureadjust{}
-\input{r6-fig-grammar-partii.tex}
-\caption{Grammar for evaluation contexts}\label{fig:ec-grammar}
-\endfig
-\subfigurestop{}
+\htmlonly\figGrammar\endhtmlonly
+
+\texonly\figEcGrammar\texonly
 
 Figure~\ref{fig:grammar} shows the grammar for the subset of the
 report this semantics models. Non-terminals are written in
@@ -178,14 +305,7 @@ rewritten into calls to the list construction functions before
 ordinary evaluation proceeds. In parallel to \nt{es}, \nt{e} represents
 expressions that have no quoted expressions.
 
-\beginfig
-\begin{center}
-\input{r6-fig-Quote.tex}
-
-\input{r6-fig-QtocQtoic.tex}
-\end{center}
-\caption{Quote}\label{fig:quote}
-\endfig
+\texonly\figQuote\endtexonly
 
 The values ($v$) are divided into four categories:
 %
@@ -222,12 +342,9 @@ The next three set of non-terminals in figure~\ref{fig:grammar} represent pairs 
 \nt{x}, and $n$ represent symbols, variables, and
 numbers respectively. The non-terminals \nt{ip}, \nt{mp}, and \nt{sym} are all assumed to all be disjoint. Additionally, the variables $x$ are assumed not to include any keywords or primitive operations, so any program variables whose names coincide with them must be renamed before the semantics can give the meaning of that program.
 
-\beginfig
-\begin{center}
-\input{r6-fig-Multiple--values--and--call-with-values.tex}
-\end{center}
-\caption{Multiple values and call-with-values}\label{fig:Multiple--values--and--call-with-values}
-\endfig
+\htmlonly\figEcGrammar\endhtmlonly
+
+\texonly\figMV\endtexonly
 
 The set of non-terminals for evaluation contexts is shown in
 figure~\ref{fig:ec-grammar}. The \nt{P} non-terminal controls where
@@ -240,6 +357,8 @@ exceptions and \va{dynamic-wind}. The starred and circled variants,
 promoted to multiple values and where multiple values are demoted to a
 single value. The \nt{U} context is used to manage the report's underspecification of the results of \sy{set!}, \va{set-car!}, and \va{set-cdr!} (see section~\ref{sec:semantics:underspecification} for details). Finally, the \nt{S} context is where quoted expressions can be simplified. The precise use of the evaluation contexts is explained along with the relevant rules.
 
+Although it is not written in the grammar figure, variable sequences bound in the store, and in \sy{lambda}, \sy{letrec}, and \sy{letrec*} must not contain any duplicates.
+
 To convert the answers ($\calA$)  of the semantics into observable results, we use these two functions:
 \input{r6-fig-observable}
 \input{r6-fig-observable-value}
@@ -247,11 +366,13 @@ They eliminate the store, and replace complex values with simple tags that indic
 
 \section{Quote}\label{sec:semantics:quote}
 
+\htmlonly\figQuote\endhtmlonly
+
 The first reduction rules that apply to any program is the 
 rules in figure~\ref{fig:quote} that eliminate quoted expressions. 
 The first two rules erase the quote for quoted expressions that do not introduce any pairs.
 The last two rules lift quoted datums to the top of the expression so
-they are evaluated only once, and turn the datums into calls to either \va{cons} or \va{consi}, via the metafunctions $\mathscr{Q}_i$ and $\mathscr{Q}_m$.
+they are evaluated only once, and turn the datums into calls to either \va{cons} or \va{consi}, via the metafunctions $\scrQ_i$ and $\scrQ_m$.
 
 Note that the left-hand side of the \rulename{6qcons} and \rulename{6qconsi} rules are identical, meaning that if one rule applies to a term, so does the other rule. 
 Accordingly, a quoted expression may be lifted out into a sequence of \va{cons} expressions, which create mutable pairs, or into a sequence of \va{consi} expressions, which create immutable pairs (see section~\ref{sec:semantics:lists} for the rules on how that happens).
@@ -270,12 +391,7 @@ into lists before those rules apply.
 
 Although the identifier \nt{qp} does not have a subscript, the semantics of PLT Redex's ``fresh'' declaration takes special care to ensures that the \nt{qp} on the right-hand side of the rule is indeed the same as the one in the side-condition.
 
-\beginfig
-\begin{center}
-\input{r6-fig-Exceptions}
-\end{center}
-\caption{Exceptions}\label{fig:Exceptions}
-\endfig
+\texonly\figExceptions\endtexonly
 
 \section{Multiple values}
 
@@ -326,13 +442,9 @@ need to consider multiple values in its first subexpression.
 Similarly, the rule for \sy{begin} does not need to consider the
 case of a single value as its first subexpression.
 
-\beginfig
-\begin{center}
-\input{r6-fig-Arithmetic.tex}
-\input{r6-fig-Basic--syntactic--forms.tex}
-\end{center}
-\caption{Arithmetic and basic forms}\label{fig:Arithmetic}
-\endfig
+\texonly\figArithmetic\endtexonly
+
+\htmlonly\figMV\endhtmlonly
 
 The other two rules in
 figure~\ref{fig:Multiple--values--and--call-with-values} handle
@@ -349,14 +461,11 @@ case that the first argument to \va{call-with-values} is a value,
 but is not of the form $\texttt{(}\sy{lambda}~\texttt{()}~e\texttt{)}$, the rule
 \rulename{6cwvw} wraps it in a thunk to trigger evaluation.
 
-\beginfig
-\begin{center}
-\input{r6-fig-Cons.tex}
-\end{center}
-\caption{Lists}\label{fig:Cons}
-\endfig
+\texonly\figCons\endtexonly
 
 \section{Exceptions}
+
+\htmlonly\figExceptions\endhtmlonly
 
 The workhorses for the exception system are $$\texttt{(}\sy{handlers}~\nt{proc}~\cdots{}~\nt{e}\texttt{)}$$ expressions and the \nt{G} and \nt{PG} evaluation contexts (shown in figure~\ref{fig:ec-grammar}). 
 The \sy{handlers} expression records the
@@ -406,12 +515,7 @@ handler. The \rulename{6xr} rule behaves similarly, except it
 raises a new exception if the handler returns. The new exception is
 created with the \sy{make-cond} special form.
 
-\beginfig
-\begin{center}
-\input{r6-fig-Eqv.tex}
-\end{center}
-\caption{Eqv}\label{fig:Eqv}
-\endfig
+\texonly\figEqv\endtexonly
 
 The \sy{make-cond} special form is a stand-in for the report's
 conditions. It does not evaluate its argument (note its absence from
@@ -427,6 +531,8 @@ raises an exception when \va{with-exception-handler} is supplied with
 incorrect arguments.
 
 \section{Arithmetic and basic forms}
+
+\htmlonly\figArithmetic\endhtmlonly
 
 This model does not include the report's arithmetic, but does include
 an idealized form in order to make experimentation with other features
@@ -454,13 +560,7 @@ subexpressions. In that case, once the first expression has been fully
 simplified, the reduction rules drop its value. If there is only a
 single subexpression, the \sy{begin} itself is dropped.
 
-\subfigurestart{}
-\beginfig
-\begin{center}
-\input{r6-fig-Procedure--application.tex}
-\end{center}
-\caption{Procedures \& application}\label{fig:Procedure--application}
-\endfig
+\texonly\figApplication\endtexonly
 
 Like the \sy{begin} evaluation contexts, the \sy{begin0}
 evaluation contexts allow evaluation of the first subexpression of a
@@ -475,6 +575,8 @@ at which point the \rulename{begin01} rule fires, and removes the
 
 \section{Lists}\label{sec:semantics:lists}
 
+\htmlonly\figCons\endhtmlonly
+
 The rules in figure~\ref{fig:Cons} handle lists. The first two rules handle \va{list} by reducing it to a succession of calls to \va{cons}, followed by \va{null}.
 
 The next two rules, \rulename{6cons} and \rulename{6consi}, allocate new \va{cons} cells.
@@ -487,17 +589,13 @@ The rules \rulename{6car} and \rulename{6cdr} extract the components of a pair f
 The rules \rulename{6setcar} and \rulename{6setcdr} handle assignment of mutable pairs. 
 They replace the contents of the appropriate location in the store with the new value, and reduce to \va{unspecified}. See section~\ref{sec:semantics:underspecification} for an explanation of how \va{unspecified} reduces.
 
-\beginfig
-\subfigureadjust{}
-\begin{center}
-\input{r6-fig-Var-set!d_.tex}
-\end{center}
-\caption{Variable-assignment relation}\label{fig:varsetd}
-\endfig
+\texonly\figVarsetd\endtexonly
 
 The next four rules handle the \va{null?} predicate and the \va{pair?} predicate, and the final four rules raise exceptions when \va{car}, \va{cdr}, \va{set-car!} or \va{set-cdr!} receive non pairs.
 
 \section{Eqv}
+
+\htmlonly\figEqv\endhtmlonly
 
 The rules for \va{eqv?} are shown in figure~\ref{fig:Eqv}. The first two rules cover most of the behavior of \va{eqv?}. 
 The first says that when the two arguments to \va{eqv?} are syntactically identical, then \va{eqv?} produces \semtrue{} and the second says that when the arguments are not syntactically identical, then \va{eqv?} produces \semfalse{}. 
@@ -507,6 +605,8 @@ For example, pairs are represented as pointers into the store and \va{eqv?} only
 The side-conditions on those first two rules ensure that they do not apply when simple term equality does not match the behavior of \va{eqv?}. There are two situations where it does not match: comparing two conditions and comparing two procedures. For the first, the report does not specify \va{eqv?}'s behavior, except to say that it must return a boolean, so the remaining two rules (\rulename{6eqct}, and \rulename{6eqcf}) allow such comparisons to return \semtrue{} or \semfalse{}. Comparing two procedures is covered in section~\ref{sec:semantics:underspecification}. 
 
 \section{Procedures and application}
+
+\htmlonly\figApplication\endhtmlonly
 
 In evaluating a procedure call, the report leaves
 unspecified the order in which arguments are evaluated. So, our reduction system allows multiple, different reductions to occur, one for each possible order of evaluation.
@@ -525,6 +625,8 @@ application that is not fully simplified and lifts it out in its own
 application, allowing it to be evaluated. Once one of the lifted
 expressions is evaluated, the \rulename{6appN} substitutes its value
 back into the original application.
+
+\htmlonly\figVarsetd\endhtmlonly
 
 The \rulename{6appN} rule also handles other applications whose
 arguments are finished by substituting the first argument for
@@ -555,15 +657,7 @@ The rule \rulename{6var} handles variable lookup in the store and \rulename{6set
 
 The next two rules \rulename{6proct} and \rulename{6procf} handle applications of \va{procedure?}, and the remaining rules cover applications of non-procedures and arity violations.
 
-\beginfig
-\subfigureadjust{}
-\begin{center}
-\input{r6-fig-Apply.tex}
-\input{r6-fig-circular_.tex}
-\end{center}
-\caption{Apply}\label{fig:Apply}
-\endfig
-\subfigurestop{}
+\figApply
 
 The rules in figure~\ref{fig:Apply} 
 cover \va{apply}. 
@@ -583,13 +677,7 @@ too few arguments to \va{apply}.
 
 \section{Call/cc and dynamic wind}
 
-\beginfig
-\begin{center}
-\input{r6-fig-Call-cc--and--dynamic-wind.tex} \\
-\input{r6-fig-TrimpRepoSt.tex}
-\end{center}
-\caption{Call/cc and dynamic wind}\label{fig:Call-cc--and--dynamic-wind}
-\endfig
+\figCallcc
 
 The specification of \va{dynamic-wind} uses 
 $\texttt{(}\sy{dw}~x~e~e~e\texttt{)}$
@@ -623,15 +711,15 @@ use in the \rulename{6throw} rule when the continuation is applied.
 That rule takes the arguments of the continuation, wraps them with a
 call to \va{values}, and puts them back into the place where the
 original call to \va{call/cc} occurred, replacing the current
-context with the context returned by the $\mathscr{T}$ metafunction.
+context with the context returned by the $\scrT$ metafunction.
 
-The $\mathscr{T}$ (for ``trim'') metafunction accepts two $D$ contexts and
+The $\scrT$ (for ``trim'') metafunction accepts two $D$ contexts and
 builds a context that matches its second argument, the destination
 context, except that additional calls to the \var{before} and
 \var{after} procedures
 from \sy{dw} expressions in the context have been added.
 
-The first clause of the $\mathscr{T}$ metafunction exploits the
+The first clause of the $\scrT$ metafunction exploits the
 $H$ context, a context that contains everything except
 \sy{dw} expressions. It ensures that shared parts of the
 \va{dynamic-wind} context are ignored, recurring deeper into the
@@ -643,29 +731,23 @@ either when there are no \sy{dw}s in the context, or when the
 metafunctions defined in figure~\ref{fig:Call-cc--and--dynamic-wind} and
 puts their results together into a \sy{begin} expression.
 
-The $\mathscr{R}$ metafunction extracts all of the \var{before}
-procedures from its argument and the $\mathscr{S}$ metafunction extracts all of the \var{after} procedures from its argument. They each construct new contexts and exploit
+The $\scrR$ metafunction extracts all of the \var{before}
+procedures from its argument and the $\scrS$ metafunction extracts all of the \var{after} procedures from its argument. They each construct new contexts and exploit
 $H$ to work through their arguments, one \sy{dw} at a time.
 In each case, the metafunctions are careful to keep the right
 \sy{dw} context around each of the procedures in case a continuation
 jump occurs during one of their evaluations. 
-Since $\mathscr{R}$,
+Since $\scrR$,
 receives the destination context, it keeps the intermediate
 parts of the context in its result.
 In contrast
-$\mathscr{S}$ discards all of the context except the \sy{dw}s,
+$\scrS$ discards all of the context except the \sy{dw}s,
 since that was the context where the call to the
 continuation occurred.
 
 \section{Letrec}
 
-\beginfig
-\begin{center}
-\input{r6-fig-Letrec.tex}
-\end{center}
-\caption{Letrec and letrec*}
-\label{fig:Letrec}
-\endfig
+\figLetrec
 
 Figre~\ref{fig:Letrec} shows the rules that handle \sy{letrec} and \sy{letrec*} and the supplementary expressions that they produce, \sy{l!} and \sy{reinit}. As a first approximation, both \va{letrec} and \va{letrec*} reduce by allocating locations in the store to hold the values of the init expressions, initializing those locations to \sy{bh} (for ``black hole''), evaluating the init expressions, and then using \va{l!} to update the locations in the store with the value of the init expressions. They also use \va{reinit} to detect when an init expression in a letrec is reentered via a continuation.
 
@@ -690,12 +772,7 @@ The \rulename{6letrec*} rule behaves similarly, but uses a \sy{begin} expression
 
 \section{Underspecification}\label{sec:semantics:underspecification}
 
-\beginfig
-\begin{center}
-\input{r6-fig-Underspecification.tex}
-\end{center}
-\caption{Explicitly unspecified behavior}\label{fig:Underspecification}
-\endfig
+\figUnderspec
 
 The rules in figure~\ref{fig:Underspecification} cover aspects of the
 semantics that are explicitly unspecified. Implementations can replace

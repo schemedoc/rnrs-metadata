@@ -57,7 +57,7 @@ algorithm may be unstable.  The procedure returns \unspecifiedreturn.
 
 \begin{scheme}
 (define v (vector 3 5 2 1))
-(vector-sort! v) \ev \theunspecified
+(vector-sort! < v) \ev \theunspecified
 v \ev \sharpsign(1 2 3 5)
 \end{scheme}
 \implresp The implementation must check the restrictions

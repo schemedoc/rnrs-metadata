@@ -1,7 +1,7 @@
 \chapter{\tt{eval}}
 \label{evalchapter}
 
-The \rsixlibrary{eval} library allows a program to create Scheme
+The \defrsixlibrary{eval} library allows a program to create Scheme
 expressions as data at run time and evaluate them.
 
 \begin{entry}{%
@@ -34,25 +34,27 @@ The bindings of the environment represented by the specifier are
 immutable: If {\cf eval} is applied to an expression that is
 determined to contain an
 assignment to one of the variables of the environment, then {\cf eval} must
-raise an exception with a condition type {\cf\&assertion}.
+raise an exception with a condition type {\cf\&syntax}.
 
 \begin{scheme}
 (library (foo)
   (export)
-  (import (rnrs))
+  (import (rnrs)
+          (rnrs eval))
   (write
     (eval '(let ((x 3)) x)
           (environment '(rnrs))))) \\\> {\it writes} 3
 
 (library (foo)
   (export)
-  (import (rnrs))
+  (import (rnrs)
+          (rnrs eval))
   (write
     (eval
       '(eval:car (eval:cons 2 4))
       (environment
         '(prefix (only (rnrs) car cdr cons null?)
-                 eval:))))) \\\> {\it writes} 2
+                 eval:))))) \\\> {\it writes} 2%
 \end{scheme}
 \end{entry}
 

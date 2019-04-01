@@ -90,7 +90,7 @@ field is called \textit{immutable}\mainindex{immutable record
 are immutable objects.  All other record types are \textit{mutable},
 and so are their records.
 
-Each call to a record constructor returns a new record with a fresh
+Each call to a record constructor of a mutable record type returns a new record with a fresh
 location (see report section~\extref{report:storagemodel}{Storage
   model}).  Consequently, for two records \vari{obj} and \varii{obj},
 the return value of {\cf (eqv? \vari{obj} \varii{obj})}, as well as the
@@ -103,7 +103,7 @@ section~\extref{report:eqv?}{Equivalence predicates}):
   their record-type descriptors are not {\cf eqv?}), {\cf eqv?}
   returns \schfalse.
 \item If \vari{obj} and \varii{obj} are both records of the
-  same record type, and are the results of two separate calls to
+  same mutable record type, and are the results of two separate calls to
   record constructors, then {\cf eqv?} returns \schfalse.
 \item If \vari{obj} and \varii{obj} are both the result of a single call to a
   record constructor, then {\cf eqv?} returns \schtrue.
@@ -230,15 +230,13 @@ Specifies that the record type is to have parent type \hyper{parent
 record type previously defined using {\cf define-record-type}. 
 The record-type definition
 associated with \hyper{parent name} must not be sealed.
-If
-no {\cf parent} clause and no {\cf parent-rtd} (see below) clause
-is present, the record type is a base type.  
 
 {\cf (protocol \hyper{expression})}
    
 \hyper{Expression} is evaluated in the same environment as the
-{\cf define-record-type} form, and must evaluate to a protocol appropriate
-for the record type being defined.
+{\cf define-record-type} form.
+It must evaluate to a procedure, and this procedure should be
+a protocol appropriate for the record type being defined.
 
 The protocol is used to create a record-constructor descriptor as
 described below.  If no {\cf protocol} clause is specified, a
@@ -292,9 +290,15 @@ generated every time a {\cf define-record-type} form is evaluated:
 
 Specifies that the record type is to have its parent type specified by
 \hyper{parent rtd}, which should be an expression evaluating to a
-record-type descriptor, and \hyper{parent cd}, which should be an
-expression evaluating to a constructor descriptor (see below).  The
-record-type definition associated with the value of \hyper{parent rtd}
+record-type descriptor or \schfalse, and \hyper{parent cd}, which should be an
+expression evaluating to a constructor descriptor (see below) or
+\schfalse.
+
+If \hyper{parent rtd} evaluates to \schfalse, then if \hyper{parent cd}
+evaluates to a value, that value must be \schfalse.
+
+If \hyper{parent rtd} evaluates to a record-type descriptor, the
+record type
 must not be sealed.  Moreover, a record-type definition must not have
 both a {\cf parent} and a {\cf parent-rtd} clause.
 
@@ -313,18 +317,24 @@ All bindings created by {\cf define-record-type} (for the record type,
 the constructor, the predicate, the accessors, and the
 mutators) must have names that are pairwise distinct.
 
+If
+no {\cf parent} clause is present, no {\cf parent-rtd} clause
+is present, or a {\cf parent-rtd} clause is present but
+\hyper{parent rtd} evaluates to \schfalse,
+the record type is a base type.  
+
 The constructor created by a {\cf define-record-type} form is a
 procedure as follows:
 %
 \begin{itemize}
-\item If there is no {\cf parent} clause and no {\cf protocol} clause,
+\item If the record type is a base type and no {\cf protocol} clause is present,
   the constructor accepts as many arguments as there are fields, in
   the same order as they appear in the {\cf fields} clause, and
   returns a record object with the fields initialized to the
   corresponding arguments.
-\item If there is no {\cf parent} or {\cf parent-rtd} clause and a
-  {\cf protocol} clause,
-  the protocol expression must evaluate to a procedure that accepts a
+\item If the record type is a base type and a {\cf protocol} clause is present,
+  the protocol expression, if it evaluates to a value,
+  must evaluate to a procedure, and this procedure should accept a
   single argument.  The protocol procedure is called once during the
   evaluation of the {\cf define-record-type} form with a
   procedure \var{p} as its argument.  It should return a procedure,
@@ -349,8 +359,8 @@ procedure as follows:
     (p v3 v2 v1)))%
  \end{scheme}
 
-\item If there is both a {\cf parent} clause and a {\cf protocol}
-  clause, then the protocol procedure is called once with a procedure
+\item If the record type is not a base type and a {\cf protocol}
+  clause is present, then the protocol procedure is called once with a procedure
   \var{n} as its argument.  As in the previous case, the protocol
   procedure should return a procedure, which will become the
   constructor bound to \hyper{constructor name}.  However, \var{n} is
@@ -384,16 +394,17 @@ also initializes the fields of this record type to the values of {\cf
 
 \item If there is a {\cf parent} clause, but no {\cf protocol} clause,
   then the parent type must not have a
-  {\cf protocol} clause itself.  The constructor bound to
+  {\cf protocol} clause itself.
+  Similarly, if there is a {\cf parent-rtd} clause whose \hyper{parent rtd}
+  evaluates to a record-type descriptor, but no {\cf protocol} clause,
+  then the \hyper{parent cd} expression, if it evaluates to a value,
+  must evaluate to \schfalse.
+  The constructor bound to
   \hyper{constructor name} is a procedure that accepts arguments corresponding to the 
   parent types' constructor first, and then one argument for each field in the same
   order as in the {\cf fields} clause. The constructor
   returns a record object with the fields initialized to the corresponding
   arguments.
-\item If there is a {\cf parent-rtd} clause, then the constructor is
-  as with a {\cf parent} clause, except that the constructor of the
-  parent type is determined by the constructor descriptor of the {\cf
-    parent-rtd} clause.
 \end{itemize}
 
 A protocol may perform other actions consistent with the requirements
@@ -615,7 +626,7 @@ called twice with the same \var{uid} symbol, the parent
 arguments in the two calls must be {\cf eqv?}, the \var{fields}
 arguments {\cf equal?}, the \var{sealed?} arguments boolean-equivalent
 (both \schfalse{} or both true), and the \var{opaque?} arguments
-boolean-equivalent.
+boolean-equivalent if the parents are not opaque.
 If these conditions are not met, an exception with condition type
 {\cf\&assertion} is raised when the second call occurs.
 If they are met, the second call returns, without creating a new
@@ -697,7 +708,7 @@ If it is \schfalse, a default \var{protocol} procedure is supplied.
 If \var{protocol} is a procedure, it is handled analogously to the
 protocol expression in a {\cf define-record-type} form.
 
-If \var{rtd} is a base record type and \var{protocol} is a procedure,
+If \var{rtd} is a base record type
 \var{parent-constructor-descriptor} must be \schfalse.  In this case,
 \var{protocol} is called by {\cf record-constructor} with a single
 argument \var{p}.  \var{P} is a procedure that expects one argument
@@ -725,7 +736,7 @@ If \var{rtd} is an extension of another record type \var{parent-rtd}
 and \var{protocol} is a procedure, \var{parent-constructor-descriptor}
 must be a constructor descriptor of \var{parent-rtd} or \schfalse.  If
 \var{parent-constructor-descriptor} is a constructor descriptor,
-\var{protocol} it is called by {\cf record-constructor} with a single
+\var{protocol} is called by {\cf record-constructor} with a single
 argument \var{n}, which is a procedure that accepts the same number of
 arguments as the constructor of \var{parent-constructor-descriptor}
 and returns a procedure \var{p} that, when called, constructs the
@@ -783,11 +794,11 @@ the parent coming before those of the extension in the argument list.
 (In the example, $j$ is the complete number of fields of the parent
 type, and $k$ is the number of fields of \var{rtd} itself.)
 
-If \var{rtd} is an extension of another record type, and
-\var{parent-constructor-descriptor} or the \var{protocol} of
-\var{parent-constructor-descriptor} is \schfalse, \var{protocol} must
-also be \schfalse, and a default constructor descriptor as
-described above is also assumed.
+If \var{rtd} is an extension of another record type and
+\var{parent-constructor-descriptor} is \schfalse{},
+\var{parent-constructor-descriptor} is treated as if it were a
+constructor descriptor for the parent rtd of \var{rtd} with a default
+protocol.
 
 \implresp If \var{protocol} is a procedure, the implementation must
 check the restrictions on it to the extent performed by applying it as
@@ -952,8 +963,8 @@ The mutator returns \unspecifiedreturn.
 (define make-point/abs
   (record-constructor :point-cd/abs))
 
-(point-x (make-point/abs -1 -2) \lev 1
-(point-y (make-point/abs -1 -2) \lev 2
+(point-x (make-point/abs -1 -2)) \lev 1
+(point-y (make-point/abs -1 -2)) \lev 2
 
 (define :cpoint
   (make-record-type-descriptor
@@ -983,7 +994,7 @@ The mutator returns \unspecifiedreturn.
 (define (color->rgb c)
   (cons 'rgb c))
 
-(cpoint-rgb (make-cpoint -1 -3 'red) \lev (rgb . red)
+(cpoint-rgb (make-cpoint -1 -3 'red)) \lev (rgb . red)
 (point-x (make-cpoint -1 -3 'red)) \lev -1
 (point-x (make-cpoint/abs -1 -3 'red)) \lev 1%
 \end{scheme}

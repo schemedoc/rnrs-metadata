@@ -91,9 +91,9 @@ hash function more than once.
 \section{Procedures}
 
 \begin{entry}{%
-\proto{hashtable?}{ \var{hashtable}}{procedure}}
+\proto{hashtable?}{ \var{obj}}{procedure}}
 
-Returns \schtrue{} if \var{hashtable} is a hashtable,
+Returns \schtrue{} if \var{obj} is a hashtable,
 \schfalse{} otherwise.
 \end{entry}
 
@@ -190,7 +190,8 @@ vector of the corresponding values.
   (hashtable-set! h 1 'one)
   (hashtable-set! h 2 'two)
   (hashtable-set! h 3 'three)
-  (hashtable-entries h)) \lev \sharpsign(1 2 3) \sharpsign(one two three)\\\>; \textrm{two return values}%
+  (hashtable-entries h)) \lev \sharpsign(1 2 3) \sharpsign(one two three)\\\>; \textrm{two return values}
+\>; \textrm{entries may be in different order}%
 \end{scheme}
 \end{entry}
 

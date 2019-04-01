@@ -68,7 +68,6 @@ as {\cf for-all} or, respectively, {\cf exists} itself.
 
 \begin{scheme}
 (for-all even? '(3 1 4 1 5 9)) \lev \schfalse{}
-(for-all even? '(3 1 4 1 5 9 . 2)) \lev \schfalse{}
 (for-all even? '(2 4 14)) \ev \schtrue{}
 (for-all even? '(2 4 14 . 9)) \lev \exception{\cf\&assertion}
 (for-all (lambda (n) (and (even? n) n))
