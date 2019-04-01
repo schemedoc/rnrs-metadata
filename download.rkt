@@ -56,7 +56,8 @@
     (for-each (lambda (file-path)
                 (rename-file-or-directory
                  file-path
-                 (build-path rnrs (file-name-from-path file-path))))
+                 (build-path rnrs (file-name-from-path file-path))
+                 #t))
               (sort files path<?))
     (delete-tmp-files tmp-dir)))
 
