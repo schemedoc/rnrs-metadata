@@ -34,9 +34,9 @@
           (lambda (out _) (write-bytes (port->bytes in) out))))))
     cache-filename))
 
-(define (download-and-extract rnrs url)
+(define (download-and-extract rnrs archive-url archive-subdir)
   (let ((files '()))
-    (call-with-input-file (download rnrs url)
+    (call-with-input-file (download rnrs archive-url)
       (lambda (tgz-input)
         (delete-tmp-files tmp-dir)
         (make-directory* tmp-dir)
@@ -47,7 +47,10 @@
          #:filter
          (lambda (_file-path file-path file-type . _)
            (cond ((and (equal? 'file file-type)
-                       (equal? #".tex" (path-get-extension file-path)))
+                       (equal? #".tex" (path-get-extension file-path))
+                       (or (not archive-subdir)
+                           (member (string->path archive-subdir)
+                                   (explode-path (path-only file-path)))))
                   (set! files (cons file-path files)))
                  (else #f))))))
     (for-each (lambda (file-path)
@@ -59,16 +62,20 @@
 
 (download-and-extract
  "r4rs"
- "https://groups.csail.mit.edu/mac/ftpdir/scheme-reports/r4rs.tar.gz")
+ "https://groups.csail.mit.edu/mac/ftpdir/scheme-reports/r4rs.tar.gz"
+ #f)
 
 (download-and-extract
  "r5rs"
- "https://groups.csail.mit.edu/mac/ftpdir/scheme-reports/r5rs.tar.gz")
+ "https://groups.csail.mit.edu/mac/ftpdir/scheme-reports/r5rs.tar.gz"
+ #f)
 
 (download-and-extract
  "r6rs"
- "http://www.r6rs.org/final/r6rs.tar.gz")
+ "http://www.r6rs.org/final/r6rs.tar.gz"
+ "document")
 
 (download-and-extract
  "r7rs"
- "https://bitbucket.org/cowan/r7rs/get/draft-10.tar.gz")
+ "https://bitbucket.org/cowan/r7rs/get/draft-10.tar.gz"
+ "spec")
