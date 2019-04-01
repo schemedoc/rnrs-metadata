@@ -18,7 +18,7 @@
          (for-each delete-tmp-files (directory-list path #:build? #t))
          (delete-directory path))))
 
-(define (ensure-cached! url cache-basename)
+(define (ensure-cached url cache-basename)
   (make-directory* cache-dir)
   (let ((cache-filename (build-path cache-dir cache-basename)))
     (unless (file-exists? cache-filename)
@@ -39,7 +39,7 @@
     (make-directory* tmp-dir)
     (make-directory* rnrs)
     (let ((files '()))
-      (call-with-input-file (ensure-cached! url cache-basename)
+      (call-with-input-file (ensure-cached url cache-basename)
         (lambda (tgz-input)
           (untgz
            tgz-input
