@@ -33,28 +33,30 @@
           (lambda (out _) (write-bytes (port->bytes in) out))))))
     cache-filename))
 
+(define (ensure-cached-rnrs rnrs url)
+  (ensure-cached url (string-append rnrs ".tar.gz")))
+
 (define (perform rnrs url)
-  (let ((cache-basename (string-append rnrs ".tar.gz")))
-    (delete-tmp-files tmp-dir)
-    (make-directory* tmp-dir)
-    (make-directory* rnrs)
-    (let ((files '()))
-      (call-with-input-file (ensure-cached url cache-basename)
-        (lambda (tgz-input)
-          (untgz
-           tgz-input
-           #:dest tmp-dir
-           #:filter
-           (lambda (_file-path file-path file-type . _)
-             (cond ((and (equal? 'file file-type)
-                         (equal? #".tex" (path-get-extension file-path)))
-                    (set! files (cons file-path files)))
-                   (else #f))))))
-      (for-each (lambda (file-path)
-                  (rename-file-or-directory
-                   file-path
-                   (build-path rnrs (file-name-from-path file-path))))
-                (sort files path<?)))
+  (let ((files '()))
+    (call-with-input-file (ensure-cached-rnrs rnrs url)
+      (lambda (tgz-input)
+        (delete-tmp-files tmp-dir)
+        (make-directory* tmp-dir)
+        (make-directory* rnrs)
+        (untgz
+         tgz-input
+         #:dest tmp-dir
+         #:filter
+         (lambda (_file-path file-path file-type . _)
+           (cond ((and (equal? 'file file-type)
+                       (equal? #".tex" (path-get-extension file-path)))
+                  (set! files (cons file-path files)))
+                 (else #f))))))
+    (for-each (lambda (file-path)
+                (rename-file-or-directory
+                 file-path
+                 (build-path rnrs (file-name-from-path file-path))))
+              (sort files path<?))
     (delete-tmp-files tmp-dir)))
 
 (define (r4rs)
