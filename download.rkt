@@ -18,9 +18,10 @@
          (for-each delete-tmp-files (directory-list path #:build? #t))
          (delete-directory path))))
 
-(define (ensure-cached url cache-basename)
+(define (download rnrs url)
   (make-directory* cache-dir)
-  (let ((cache-filename (build-path cache-dir cache-basename)))
+  (let* ((cache-basename (string-append rnrs ".tar.gz"))
+         (cache-filename (build-path cache-dir cache-basename)))
     (unless (file-exists? cache-filename)
       (fprintf (current-error-port)
                "Downloading <~a> from <~a>...~%" cache-basename url)
@@ -33,12 +34,9 @@
           (lambda (out _) (write-bytes (port->bytes in) out))))))
     cache-filename))
 
-(define (ensure-cached-rnrs rnrs url)
-  (ensure-cached url (string-append rnrs ".tar.gz")))
-
-(define (perform rnrs url)
+(define (download-and-extract rnrs url)
   (let ((files '()))
-    (call-with-input-file (ensure-cached-rnrs rnrs url)
+    (call-with-input-file (download rnrs url)
       (lambda (tgz-input)
         (delete-tmp-files tmp-dir)
         (make-directory* tmp-dir)
@@ -59,27 +57,18 @@
               (sort files path<?))
     (delete-tmp-files tmp-dir)))
 
-(define (r4rs)
-  (perform
-   "r4rs"
-   "https://groups.csail.mit.edu/mac/ftpdir/scheme-reports/r4rs.tar.gz"))
+(download-and-extract
+ "r4rs"
+ "https://groups.csail.mit.edu/mac/ftpdir/scheme-reports/r4rs.tar.gz")
 
-(define (r5rs)
-  (perform
-   "r5rs"
-   "https://groups.csail.mit.edu/mac/ftpdir/scheme-reports/r5rs.tar.gz"))
+(download-and-extract
+ "r5rs"
+ "https://groups.csail.mit.edu/mac/ftpdir/scheme-reports/r5rs.tar.gz")
 
-(define (r6rs)
-  (perform
-   "r6rs"
-   "http://www.r6rs.org/final/r6rs.tar.gz"))
+(download-and-extract
+ "r6rs"
+ "http://www.r6rs.org/final/r6rs.tar.gz")
 
-(define (r7rs)
-  (perform
-   "r7rs"
-   "https://bitbucket.org/cowan/r7rs/get/draft-10.tar.gz"))
-
-(r4rs)
-(r5rs)
-(r6rs)
-(r7rs)
+(download-and-extract
+ "r7rs"
+ "https://bitbucket.org/cowan/r7rs/get/draft-10.tar.gz")
