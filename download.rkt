@@ -18,9 +18,9 @@
          (for-each delete-tmp-files (directory-list path #:build? #t))
          (delete-directory path))))
 
-(define (download rnrs url)
+(define (download rnrs extension url)
   (make-directory* cache-dir)
-  (let* ((cache-basename (string-append rnrs ".tar.gz"))
+  (let* ((cache-basename (string-append rnrs extension))
          (cache-filename (build-path cache-dir cache-basename)))
     (unless (file-exists? cache-filename)
       (fprintf (current-error-port)
@@ -34,9 +34,9 @@
           (lambda (out _) (write-bytes (port->bytes in) out))))))
     cache-filename))
 
-(define (download-and-extract rnrs archive-url archive-subdir)
+(define (download-and-extract rnrs extension archive-url archive-subdir)
   (let ((files '()))
-    (call-with-input-file (download rnrs archive-url)
+    (call-with-input-file (download rnrs extension archive-url)
       (lambda (tgz-input)
         (delete-tmp-files tmp-dir)
         (make-directory* tmp-dir)
@@ -62,22 +62,22 @@
     (delete-tmp-files tmp-dir)))
 
 (download-and-extract
- "r4rs"
- "https://groups.csail.mit.edu/mac/ftpdir/scheme-reports/r4rs.tar.gz"
+ "r4rs" ".tar"
+ "https://groups.csail.mit.edu/mac/ftpdir/scheme-reports/r4rs.tar"
  #f)
 
 (download-and-extract
- "r5rs"
- "https://groups.csail.mit.edu/mac/ftpdir/scheme-reports/r5rs.tar.gz"
+ "r5rs" ".tar"
+ "https://groups.csail.mit.edu/mac/ftpdir/scheme-reports/r5rs.tar"
  #f)
 
 (download-and-extract
- "r6rs"
+ "r6rs" ".tar.gz"
  ;;"http://www.r6rs.org/final/r6rs.tar.gz"
  "https://github.com/schemedoc/r6rs/archive/master.tar.gz"
  "document")
 
 (download-and-extract
- "r7rs"
+ "r7rs" ".tar.gz"
  "https://bitbucket.org/cowan/r7rs/get/draft-10.tar.gz"
  "spec")
