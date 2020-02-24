@@ -143,5 +143,8 @@
      (parameterize ((current-output-port out))
        (write-rnrs-protos rnrs)))))
 
+;;(write-rnrs-protos-into-args-file "r3rs")
+;;(write-rnrs-protos-into-args-file "r4rs")
+;;(write-rnrs-protos-into-args-file "r5rs")
 (write-rnrs-protos-into-args-file "r6rs")
 (write-rnrs-protos-into-args-file "r7rs")
