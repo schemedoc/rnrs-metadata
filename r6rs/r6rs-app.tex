@@ -146,7 +146,7 @@ forms specified in the report and the library report:
 %
 \begin{itemize}
 \item For {\cf cond} forms (see report section~\extref{report:cond}{Derived
-    conditionals}), a \hyper{cond clause} may take one of the follow
+    conditionals}), a \hyper{cond clause} may take one of the following
   forms:
 \begin{scheme}
 [\hyper{test} \hyperi{expression} \dotsfoo]
@@ -154,7 +154,7 @@ forms specified in the report and the library report:
 {}[else \hyperi{expression} \hyperii{expression} \dotsfoo]%
 \end{scheme}
 \item For {\cf case} forms (see report section~\extref{report:case}{Derived
-    conditionals}), a \hyper{case clause} may take one of the follow
+    conditionals}), a \hyper{case clause} may take one of the following
   forms:
 \begin{scheme}
 [(\hyperi{datum} \dotsfoo) \hyperi{expression} \hyperii{expression} \dotsfoo]
@@ -199,7 +199,7 @@ forms specified in the report and the library report:
 [\hyper{formals} \hyper{body}]%
 \end{scheme}
 \item For {\cf guard} forms (see library section~\extref{lib:guard}{Exceptions}),
-a \hyper{cond clause} may take one of the follow forms:
+a \hyper{cond clause} may take one of the following forms:
 \begin{scheme}
 [\hyper{test} \hyperi{expression} \dotsfoo]
 {}[\hyper{test} => \hyper{expression}] 
@@ -281,11 +281,13 @@ performed by altering a script header from its default form.
 (import (rnrs base)
         (rnrs io ports)
         (rnrs programs))
-(put-bytes (standard-output-port)
-           (call-with-port
-               (open-file-input-port
-                 (cadr (command-line)))
-             get-bytes-all))%
+(let ((p (standard-output-port)))
+  (put-bytevector p
+                  (call-with-port
+                      (open-file-input-port
+                        (cadr (command-line)))
+                    get-bytevector-all))
+  (close-port p))%
 \end{scheme}
 
 \section{Platform considerations}
