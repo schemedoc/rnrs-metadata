@@ -62,6 +62,11 @@
     (delete-tmp-files tmp-dir)))
 
 (download-and-extract
+ "r3rs" ".tar"
+ "https://groups.csail.mit.edu/mac/ftpdir/scheme-reports/r3rs.tar"
+ #f)
+
+(download-and-extract
  "r4rs" ".tar"
  "https://groups.csail.mit.edu/mac/ftpdir/scheme-reports/r4rs.tar"
  #f)
