@@ -1,0 +1,147 @@
+\extrapart{Notes}
+
+
+\todo{Perhaps this section should be made to disappear.
+Can these remarks be moved somewhere else?}
+
+\subsection*{Language changes}
+\label{differences}
+
+This section enumerates the changes that have been made to Scheme since
+the ``Revised revised report''~\cite{RRRS} was published.
+
+
+\begin{itemize}
+\item The character {\tt\verb"^"} (circumflex) is now an extended
+alphabetic character
+
+\item The objects returned by literal expressions are permitted to be
+immutable
+
+\item The list to which a rest-argument becomes bound must be newly allocated
+
+\item \ide{Do} variables are updated by rebinding rather than by
+assignment
+
+\item New expression type: \ide{delay}
+
+\item Quasiquote (backquote) has been improved in several ways:
+vectors are allowed; nesting is allowed; and an external syntax for
+quasiquote expressions (analogous to that for \ide{quote}) has been
+defined
+
+\item The semantics of definitions of the form
+{\tt(define (\hyper{variable} \hyper{formals}) \hyper{body})}
+no longer involves an implicit {\tt rec} or {\tt letrec}
+
+\item The ``curried'' definition syntax has been removed
+
+\item The boolean constants are now written \schtrue{} and \schfalse{}
+instead of {\tt\#!true} and {\tt\#!false}
+
+\item The syntax {\tt\#!null} (for the empty list\index{empty list}) has
+been removed
+
+\item New procedures: \ide{boolean?}, \ide{procedure?}, and \ide{force}
+
+\item The value of \ide{eq?}\ on numbers and characters is now unspecified
+
+\item \ide{Eq?}\ and \ide{eqv?}\ now explicitly permit operationally equivalent
+procedures to be identified
+
+\item \ide{Eqv?}\ distinguishes exact numbers from inexact ones, even if they
+are equal according to \ide{=}
+
+\item List, string, and vector indexes must be {\em exact} integers
+
+\item \ide{Atan} now admits either one or two arguments
+
+\todo{
+\item {\tt Call-with-input-file} and {\tt call-with-output-file} renamed
+to \ide{call-with-input-port} and \ide{call-with-output-port}
+}
+
+\item Expression types removed: {\tt named-lambda}, {\tt rec}, \hbox{\tt sequence}
+
+\item Procedures removed:~{\tt append!},~{\tt string-null?}, {\tt
+substring-fill!}, {\tt substring-move-left!}, {\tt
+substring-move-right!}, {\tt object-hash}, {\tt object-unhash}, {\tt
+1+}, {\tt -1+}
+
+\item Redundant procedure names removed: {\tt <?}, {\tt <=?}, {\tt =?},
+{\tt >?}, and {\tt >=?}
+
+\end{itemize}
+
+
+\todo{
+\subsection*{Comparison with the dialect used in~\cite{SICP}}
+Compare with S\&ICP: simple renamings like {\tt print}; easily
+implemented things like {\tt cons-stream}; more grave and controversial
+omissions like {\tt eval} and {\tt make-envi\-ron\-ment}.}
+
+
+\subsection*{Keywords as variable names}
+
+Some implementations allow arbitrary syntactic
+keywords \index{keyword}\index{syntactic keyword}to be used as variable
+names, instead of reserving them, as this report would have
+it.\index{variable} But this creates ambiguities in the interpretation
+of expressions: for example, in the following, it's not clear whether
+the expression {\tt (if 1 2 3)} should be treated as a procedure call or
+as a conditional.
+
+\begin{scheme}
+(define if list)
+(if 1 2 3)    \ev  2 {\em{}or} (1 2 3)%
+\end{scheme}
+
+These ambiguities are usually resolved in some consistent way within any
+given implementation, but no particular treatment stands out as being
+clearly superior to any other, so these situations were excluded for the
+purposes of this report.
+
+
+\subsection*{Macros}
+
+Scheme does not have any standard facility for defining new kinds of
+expressions.\index{macros}
+
+\vest The ability to alter the syntax of the language creates
+numerous problems.  All current implementations of Scheme have macro
+facilities that solve those problems to one degree or another, but the
+solutions are quite different and it isn't clear at this time which
+solution is best, or indeed whether any of the solutions are truly
+adequate.  Rather than standardize, we are encouraging implementations
+to continue to experiment with different solutions.
+
+\vest The main problems with traditional macros are: They must be
+defined to the system before any code using them is loaded; this is a
+common source of obscure bugs.  They are usually global; macros can be
+made to follow lexical scope rules \todo{flushed: ``as in Common
+Lisp's {\tt macrolet}''; OK?}, but many people find the resulting scope rules
+confusing.  Unless they are written very carefully, macros are
+vulnerable to inadvertant capture of free variables; to get around this,
+for example, macros may have to generate code in which procedure values
+appear as quoted constants.  There is a similar problem with syntactic
+keywords if the keywords of special forms are not reserved.  If keywords
+are reserved, then either macros introduce new reserved words,
+invalidating old code, or else special forms defined by the programmer
+do not have the same status as special forms defined by the system.
+
+\todo{Refer to Pitman's special forms paper.}
+\todo{Pitman sez: Discuss importance of having a small number of special forms
+so that programs can inspect each other.}
+
+\todo{Move cwcc history back here? --- Andy Cromarty is concerned about
+confusion over who the audience is.}
+
+\todo{Cromarty:
+23. NOTES, p.35ff.: This material should stay somehow.  We need to
+    make it clear that R$^3$ Scheme is not being touted as Yet Another
+    Ultimate Solution To The Programming Language Problem, but rather
+    as a snapshot of a *process* of good design, for which not all
+    answers have yet been found.  We also ought to use the opportunity
+    for publicity afforded us by SIGPLAN to advertise some of the thorny
+    unsolved problems that need further research, and encourage
+    language designers to work on them.}
